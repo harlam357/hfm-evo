@@ -3,10 +3,8 @@ using System.Globalization;
 
 namespace HFM.Core.Logging;
 
-public class FileSystemLogger : LoggerBase, ILoggerEvents
+public class FileSystemLogger : Logger, ILoggerEvents
 {
-    public const string NameFormat = "({0}) {1}";
-
     public string Path { get; }
 
     public FileSystemLogger(string path) : base(LoggerLevel.Info)

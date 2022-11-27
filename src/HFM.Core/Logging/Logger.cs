@@ -1,8 +1,10 @@
 ﻿namespace HFM.Core.Logging;
 
-public abstract class LoggerBase : ILogger
+public abstract class Logger : ILogger
 {
-    protected LoggerBase(LoggerLevel loggerLevel)
+    public const string NameFormat = "({0}) {1}";
+
+    protected Logger(LoggerLevel loggerLevel)
     {
         Level = loggerLevel;
     }
@@ -30,7 +32,7 @@ public abstract class LoggerBase : ILogger
 }
 
 [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-public class NullLogger : LoggerBase
+public class NullLogger : Logger
 {
     public static NullLogger Instance { get; } = new();
 
