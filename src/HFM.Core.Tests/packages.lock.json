@@ -85,13 +85,29 @@
         "resolved": "5.11.0",
         "contentHash": "eaiXkUjC4NPcquGWzAGMXjuxvLwc6XGKMptSyOGQeT0X70BUZObuybJFZLA0OfTdueLd3US23NBPTBb6iF3V1Q=="
       },
+      "protobuf-net": {
+        "type": "Transitive",
+        "resolved": "3.1.25",
+        "contentHash": "vej8g3+5KpwuwA20xoOMJK9nUM/hr7maSu56pIqItmX28JbXF0co1/pD6Mg84+mhLYRQpKiSlOxIDvtaYojKWA==",
+        "dependencies": {
+          "protobuf-net.Core": "3.1.25"
+        }
+      },
+      "protobuf-net.Core": {
+        "type": "Transitive",
+        "resolved": "3.1.25",
+        "contentHash": "LqDpeU+rbzO/uD2iYUBIGCgaeCBrxwmCDGVmUNZ67yShrGLlLJHwFMcDsGZUCxE2iHdRJawMUkTfs3HYIXiqWg=="
+      },
       "System.Reflection.Metadata": {
         "type": "Transitive",
         "resolved": "1.6.0",
         "contentHash": "COC1aiAJjCoA5GBF+QKL2uLqEBew4JsCkQmoHKbN3TlOZKa2fKLz5CpiRQKDz0RsAOEGsVKqOD5bomsXq/4STQ=="
       },
       "hfm.core": {
-        "type": "Project"
+        "type": "Project",
+        "dependencies": {
+          "protobuf-net": "[3.1.25, )"
+        }
       }
     }
   }

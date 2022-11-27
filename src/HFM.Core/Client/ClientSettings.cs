@@ -10,56 +10,51 @@ public enum ClientType
 }
 
 [DataContract(Namespace = "")]
-public class ClientSettings
+public record ClientSettings
 {
-    public ClientSettings()
-    {
-        Port = DefaultPort;
-    }
-
     public ClientIdentifier ClientIdentifier => new(Name, Server, Port, Guid);
 
     /// <summary>
     /// Gets or sets the client type.
     /// </summary>
     [DataMember(Order = 1)]
-    public ClientType ClientType { get; set; }
+    public ClientType ClientType { get; init; }
 
     /// <summary>
     /// Gets or sets the client name.
     /// </summary>
     [DataMember(Order = 2)]
-    public string? Name { get; set; }
+    public string? Name { get; init; }
 
     /// <summary>
     /// Gets or sets the client host name or IP address.
     /// </summary>
     [DataMember(Order = 3)]
-    public string? Server { get; set; }
+    public string? Server { get; init; }
 
     /// <summary>
     /// Gets or sets the client host port number.
     /// </summary>
     [DataMember(Order = 4)]
-    public int Port { get; set; }
+    public int Port { get; init; } = DefaultPort;
 
     /// <summary>
     /// Gets or sets the client host password.
     /// </summary>
     [DataMember(Order = 5)]
-    public string? Password { get; set; }
+    public string? Password { get; init; }
 
     /// <summary>
     /// Gets or sets the client unique identifier.
     /// </summary>
     [DataMember(Order = 6)]
-    public Guid Guid { get; set; }
+    public Guid Guid { get; init; }
 
     /// <summary>
     /// Gets or set a value that determines if a client connection will be disabled.
     /// </summary>
     [DataMember(Order = 7)]
-    public bool Disabled { get; set; }
+    public bool Disabled { get; init; }
 
     private const string FahClientLogFileName = "log.txt";
 
