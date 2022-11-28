@@ -16,7 +16,7 @@ public interface ILoggerEvents
 }
 
 [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-public class NullLoggerEvents : ILoggerEvents
+public sealed class NullLoggerEvents : ILoggerEvents
 {
     public static NullLoggerEvents Instance { get; } = new();
 

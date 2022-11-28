@@ -32,7 +32,7 @@ public abstract class Logger : ILogger
 }
 
 [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-public class NullLogger : Logger
+public sealed class NullLogger : Logger
 {
     public static NullLogger Instance { get; } = new();
 
