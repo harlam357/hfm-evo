@@ -76,7 +76,7 @@ public record ClientSettings
     /// </summary>
     public static bool ValidateName(string? name)
     {
-        if (name == null) return false;
+        if (name is null) return false;
 
         string pattern = String.Format(CultureInfo.InvariantCulture,
             "^{0}{1}+{2}$", NameFirstCharPattern, NameMiddleCharsPattern, NameLastCharPattern);
