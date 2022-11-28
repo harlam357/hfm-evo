@@ -14,13 +14,12 @@ public class FileSystemLoggerTests
         [Test]
         public void DefaultLevelIsInfo() => Assert.That(_logger!.Level, Is.EqualTo(LoggerLevel.Info));
 
-        [TestCase(LoggerLevel.Off, true)]
-        [TestCase(LoggerLevel.Error, true)]
-        [TestCase(LoggerLevel.Warn, true)]
-        [TestCase(LoggerLevel.Info, true)]
-        [TestCase(LoggerLevel.Debug, false)]
-        public void IsEnabled(LoggerLevel level, bool expected) =>
-            Assert.That(_logger!.IsEnabled(level), Is.EqualTo(expected));
+        [TestCase(LoggerLevel.Off, ExpectedResult = true)]
+        [TestCase(LoggerLevel.Error, ExpectedResult = true)]
+        [TestCase(LoggerLevel.Warn, ExpectedResult = true)]
+        [TestCase(LoggerLevel.Info, ExpectedResult = true)]
+        [TestCase(LoggerLevel.Debug, ExpectedResult = false)]
+        public bool IsEnabled(LoggerLevel level) => _logger!.IsEnabled(level);
 
         [Test]
         public void RaisesLoggedEventWhenLevelIsEnabled()
