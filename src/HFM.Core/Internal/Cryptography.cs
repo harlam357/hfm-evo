@@ -3,19 +3,18 @@ using System.Text;
 
 namespace HFM.Core.Internal;
 
-[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 internal class Cryptography
 {
     private string SymmetricKey { get; }
-    private string IV { get; }
+    private string InitializationVector { get; }
 
-    internal Cryptography(string symmetricKey, string iv)
+    internal Cryptography(string symmetricKey, string initializationVector)
     {
         SymmetricKey = symmetricKey;
-        IV = iv;
+        InitializationVector = initializationVector;
     }
 
-    internal string DecryptValue(string value)
+    internal string DecryptValue(string? value)
     {
         if (String.IsNullOrWhiteSpace(value))
         {
@@ -62,7 +61,8 @@ internal class Cryptography
         return plainText;
     }
 
-    internal string EncryptValue(string value)
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    internal string EncryptValue(string? value)
     {
         if (String.IsNullOrWhiteSpace(value))
         {
@@ -111,7 +111,7 @@ internal class Cryptography
         var algorithm = new RijndaelManaged();
 #pragma warning restore SYSLIB0022
         SetKey(algorithm, Encoding.UTF8.GetBytes(SymmetricKey));
-        SetIV(algorithm, Encoding.UTF8.GetBytes(IV));
+        SetIV(algorithm, Encoding.UTF8.GetBytes(InitializationVector));
         return algorithm;
     }
 
@@ -129,6 +129,7 @@ internal class Cryptography
         algorithm.IV = ResizeByteArray(iv, minBytes, maxBytes);
     }
 
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     private static byte[] ResizeByteArray(byte[] bytes, int minBytes, int maxBytes)
     {
         if (maxBytes > 0)
