@@ -11,25 +11,23 @@ using HFM.Preferences.Data;
 
 namespace HFM.Preferences.Internal;
 
-#nullable disable
-
 internal interface IMetadata
 {
     Type DataType { get; }
 
-    object Data { get; set; }
+    object? Data { get; set; }
 }
 
 internal interface IMetadata<T> : IMetadata
 {
-    new T Data { get; set; }
+    new T? Data { get; set; }
 }
 
 internal class ExpressionMetadata<T> : IMetadata<T>
 {
     private readonly PreferenceData _data;
     private readonly Func<PreferenceData, T> _getter;
-    private readonly Action<PreferenceData, T> _setter;
+    private readonly Action<PreferenceData, T?>? _setter;
 
     public ExpressionMetadata(PreferenceData data, Expression<Func<PreferenceData, T>> propertyExpression)
         : this(data, propertyExpression, false)
@@ -44,7 +42,7 @@ internal class ExpressionMetadata<T> : IMetadata<T>
         _getter = propertyExpression.Compile();
         if (!readOnly)
         {
-            _setter = propertyExpression.ToSetter();
+            _setter = propertyExpression.ToSetter()!;
         }
     }
 
@@ -61,14 +59,14 @@ internal class ExpressionMetadata<T> : IMetadata<T>
         }
     }
 
-    private static PropertyInfo GetPreferenceDataPropertyInfo(LambdaExpression propertyExpression)
+    private static PropertyInfo? GetPreferenceDataPropertyInfo(LambdaExpression propertyExpression)
     {
         if (propertyExpression.Body is not MemberExpression bodyIsMemberExpression)
         {
             return null;
         }
 
-        MemberExpression memberExpression = bodyIsMemberExpression;
+        MemberExpression? memberExpression = bodyIsMemberExpression;
         while (memberExpression != null)
         {
             if (memberExpression.Member is PropertyInfo pi && pi.DeclaringType == typeof(PreferenceData))
@@ -82,13 +80,13 @@ internal class ExpressionMetadata<T> : IMetadata<T>
 
     public Type DataType => typeof(T);
 
-    object IMetadata.Data
+    object? IMetadata.Data
     {
         get => Data;
-        set => Data = (T)value;
+        set => Data = (T?)value;
     }
 
-    public virtual T Data
+    public virtual T? Data
     {
         get => _getter(_data);
         set
@@ -102,19 +100,19 @@ internal class ExpressionMetadata<T> : IMetadata<T>
     }
 }
 
-internal class EncryptedExpressionMetadata : ExpressionMetadata<string>
+internal class EncryptedExpressionMetadata : ExpressionMetadata<string?>
 {
     private const string InitializationVector = "3k1vKL=Cz6!wZS`I";
     private const string SymmetricKey = "%`Bb9ega;$.GUDaf";
     private static readonly Cryptography _Cryptography = new(SymmetricKey, InitializationVector);
 
-    public EncryptedExpressionMetadata(PreferenceData data, Expression<Func<PreferenceData, string>> propertyExpression)
+    public EncryptedExpressionMetadata(PreferenceData data, Expression<Func<PreferenceData, string?>> propertyExpression)
         : base(data, propertyExpression)
     {
 
     }
 
-    public override string Data
+    public override string? Data
     {
         get => _Cryptography.DecryptValue(base.Data);
         set => base.Data = _Cryptography.EncryptValue(value);

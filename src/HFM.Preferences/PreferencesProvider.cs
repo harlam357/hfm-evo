@@ -231,7 +231,7 @@ public abstract class PreferencesProvider : IPreferences
         }
         if (typeof(T).IsAssignableFrom(metadata.DataType))
         {
-            return (T)metadata.Data.Copy();
+            return (T?)metadata.Data.Copy();
         }
         if (typeof(T).IsEnum && metadata.DataType == typeof(string))
         {
@@ -242,7 +242,7 @@ public abstract class PreferencesProvider : IPreferences
 
             try
             {
-                return (T)Enum.Parse(typeof(T), ((IMetadata<string>)metadata).Data);
+                return (T)Enum.Parse(typeof(T), ((IMetadata<string>)metadata).Data!);
             }
             catch (Exception)
             {
@@ -258,7 +258,7 @@ public abstract class PreferencesProvider : IPreferences
             "Preference '{0}' of Type '{1}' does not exist.", key, typeof(T)));
     }
 
-    public void Set<T>(Preference key, T value)
+    public void Set<T>(Preference key, T? value)
     {
         var metadata = _preferences[key];
         if (metadata.DataType == typeof(T))
@@ -278,9 +278,9 @@ public abstract class PreferencesProvider : IPreferences
                 OnPreferenceChanged(key);
             }
         }
-        else if (metadata.DataType == typeof(int) && value != null && value.GetType().IsEnum)
+        else if (metadata.DataType == typeof(int) && value is not null && value.GetType().IsEnum)
         {
-            var newValue = (int)Convert.ChangeType(value, typeof(int));
+            var newValue = (int)Convert.ChangeType(value, typeof(int), CultureInfo.InvariantCulture);
 
             var intMetadata = (IMetadata<int>)metadata;
             if (!intMetadata.Data.Equals(newValue))
@@ -292,19 +292,18 @@ public abstract class PreferencesProvider : IPreferences
         else if (metadata.DataType == typeof(int))
         {
             var stringValue = value as string;
-            var newValue = String.IsNullOrEmpty(stringValue) ? default : Int32.Parse(stringValue);
+            var newValue = String.IsNullOrEmpty(stringValue) ? default : Int32.Parse(stringValue, CultureInfo.InvariantCulture);
 
             var intMetadata = (IMetadata<int>)metadata;
             if (!intMetadata.Data.Equals(newValue))
             {
-                // Issue 189 - Use default value if string is null or empty
                 intMetadata.Data = newValue;
                 OnPreferenceChanged(key);
             }
         }
-        else if (metadata.DataType == typeof(string) && value.GetType().IsEnum)
+        else if (metadata.DataType == typeof(string) && value is not null && value.GetType().IsEnum)
         {
-            string newValue = value.ToString();
+            string? newValue = value.ToString();
 
             if (metadata.Data == null || !metadata.Data.Equals(value))
             {
@@ -342,7 +341,7 @@ public abstract class PreferencesProvider : IPreferences
         public void AddReadOnly<T>(Preference key, Expression<Func<PreferenceData, T>> propertyExpression) =>
             _inner.Add(key, new ExpressionMetadata<T>(Data, propertyExpression, true));
 
-        public void AddEncrypted(Preference key, Expression<Func<PreferenceData, string>> propertyExpression) =>
+        public void AddEncrypted(Preference key, Expression<Func<PreferenceData, string?>> propertyExpression) =>
             _inner.Add(key, new EncryptedExpressionMetadata(Data, propertyExpression));
 
         public IMetadata this[Preference key] => _inner[key];

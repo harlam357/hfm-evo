@@ -104,7 +104,7 @@ public readonly struct ClientIdentifier : IEquatable<ClientIdentifier>, ICompara
     {
         var match = connectionString is null ? null : ServerPortRegex.Match(connectionString);
         return match is { Success: true }
-            ? new ClientIdentifier(name, match.Groups["Server"].Value, Convert.ToInt32(match.Groups["Port"].Value), guid)
+            ? new ClientIdentifier(name, match.Groups["Server"].Value, Convert.ToInt32(match.Groups["Port"].Value, CultureInfo.InvariantCulture), guid)
             : new ClientIdentifier(name, connectionString, ClientSettings.NoPort, guid);
     }
 }

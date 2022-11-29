@@ -30,7 +30,7 @@ public interface IPreferences
     /// <typeparam name="T">The type of the preference value.</typeparam>
     /// <param name="key">The preference key.</param>
     /// <param name="value">The preference value.</param>
-    void Set<T>(Preference key, T value);
+    void Set<T>(Preference key, T? value);
 
     /// <summary>
     /// Raised when a preference value is changed.

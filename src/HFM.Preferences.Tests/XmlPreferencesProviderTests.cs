@@ -206,7 +206,7 @@ public class XmlPreferencesProviderTests : IDisposable
             {
                 _preferences!.Load();
 
-                string actual = _preferences!.Get<string>(Preference.ProjectDownloadUrl);
+                string? actual = _preferences!.Get<string>(Preference.ProjectDownloadUrl);
                 const string expected = "https://apps.foldingathome.org/psummary.json";
                 Assert.That(actual, Is.EqualTo(expected));
             }
