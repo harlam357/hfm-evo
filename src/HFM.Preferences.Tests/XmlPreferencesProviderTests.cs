@@ -213,7 +213,7 @@ public class XmlPreferencesProviderTests : IDisposable
         }
 
         [TestFixture]
-        public class LoadExecutesMainWindowGridColumnsUpgrade : GivenXmlPreferencesProvider
+        public class LoadExecutesMainWindowGridColumnsInsertUpgrade : GivenXmlPreferencesProvider
         {
             [SetUp]
             public override void BeforeEach()
@@ -283,6 +283,61 @@ public class XmlPreferencesProviderTests : IDisposable
                 int actual = _preferences!.Get<int>(Preference.QueueSplitterLocation);
                 const int expected = 289;
                 Assert.That(actual, Is.EqualTo(expected));
+            }
+        }
+
+        [TestFixture]
+        public class LoadExecutesMainWindowGridColumnsDeleteUpgrade : GivenXmlPreferencesProvider
+        {
+            [SetUp]
+            public override void BeforeEach()
+            {
+                base.BeforeEach();
+
+                var data = new PreferenceData
+                {
+                    ApplicationVersion = "9.26.0.0",
+                    MainWindowGrid =
+                    {
+                        Columns = new List<string>
+                        {
+                            "00,50,True,0",
+                            "01,60,True,1",
+                            "02,110,True,2",
+                            "03,93,True,3",
+                            "04,44,True,4",
+                            "05,55,True,5",
+                            "06,66,True,6",
+                            "07,77,True,7",
+                            "08,88,True,8",
+                            "09,99,True,9",
+                            "10,11,True,10"
+                        }
+                    }
+                };
+                _preferences = new DoesNotReadFromOrWriteToDiskXmlPreferencesProvider(ApplicationVersion, data);
+            }
+
+            [Test]
+            public void ThenMainWindowGridColumnsAreUpdated()
+            {
+                _preferences!.Load();
+
+                var actual = _preferences.Get<ICollection<string>>(Preference.FormColumns);
+                var expected = new List<string>
+                {
+                    "00,50,True,0",
+                    "01,60,True,1",
+                    "02,110,True,2",
+                    "03,93,True,3",
+                    "04,44,True,4",
+                    "05,55,True,5",
+                    "06,66,True,6",
+                    "07,77,True,7",
+                    "08,88,True,8",
+                    "09,11,True,9"
+                };
+                CollectionAssert.AreEqual(expected, actual);
             }
         }
     }

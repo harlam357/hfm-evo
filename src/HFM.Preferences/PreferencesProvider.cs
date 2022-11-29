@@ -212,6 +212,7 @@ public abstract class PreferencesProvider : IPreferences
 
     protected void Write(PreferenceData data) => OnWrite(data);
 
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     protected virtual void OnWrite(PreferenceData data)
     {
         // do nothing
