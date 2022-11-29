@@ -14,7 +14,12 @@ public static class FormColumnPreference
 
         try
         {
-            return (Int32.Parse(tokens[0]), Int32.Parse(tokens[1]), Boolean.Parse(tokens[2]), Int32.Parse(tokens[3]));
+            var cultureInfo = CultureInfo.InvariantCulture;
+            return (
+                Int32.Parse(tokens[0], cultureInfo),
+                Int32.Parse(tokens[1], cultureInfo),
+                Boolean.Parse(tokens[2]),
+                Int32.Parse(tokens[3], cultureInfo));
         }
         catch (FormatException)
         {
@@ -24,8 +29,8 @@ public static class FormColumnPreference
 
     public static string Format(int displayIndex, int width, bool visible, int index) =>
         String.Format(CultureInfo.InvariantCulture,
-            "{0},{1},{2},{3}",
-            displayIndex.ToString("D2"),
+            "{0:D2},{1},{2},{3}",
+            displayIndex,
             width,
             visible,
             index);
