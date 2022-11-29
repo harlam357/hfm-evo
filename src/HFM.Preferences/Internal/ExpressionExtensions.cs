@@ -7,6 +7,7 @@ namespace HFM.Preferences.Internal;
 
 #nullable disable
 
+[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 internal static class ExpressionExtensions
 {
     internal static Action<T, TValue> ToSetter<T, TValue>(this Expression<Func<T, TValue>> getter)
