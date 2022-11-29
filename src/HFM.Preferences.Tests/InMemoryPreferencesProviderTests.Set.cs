@@ -108,9 +108,21 @@ public partial class InMemoryPreferencesProviderTests
         }
 
         [Test]
-        public void CollectionIsCopied()
+        public void EnumerableIsCopied()
         {
             var enumerable = (IEnumerable<string>)new[] { "a", "b", "c" };
+            _preferences!.Set(Preference.FormColumns, enumerable);
+            Assert.Multiple(() =>
+            {
+                Assert.That(_data!.MainWindowGrid.Columns, Has.Count.EqualTo(3));
+                Assert.That(_data!.MainWindowGrid.Columns, Is.Not.SameAs(enumerable));
+            });
+        }
+
+        [Test]
+        public void CollectionIsCopied()
+        {
+            var enumerable = (ICollection<string>)new[] { "a", "b", "c" };
             _preferences!.Set(Preference.FormColumns, enumerable);
             Assert.Multiple(() =>
             {
