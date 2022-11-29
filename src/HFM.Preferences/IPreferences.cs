@@ -22,7 +22,7 @@ public interface IPreferences
     /// </summary>
     /// <typeparam name="T">The type of the preference value.</typeparam>
     /// <param name="key">The preference key.</param>
-    T Get<T>(Preference key);
+    T? Get<T>(Preference key);
 
     /// <summary>
     /// Sets a preference value.

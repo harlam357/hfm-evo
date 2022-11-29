@@ -218,7 +218,7 @@ public abstract class PreferencesProvider : IPreferences
         // do nothing
     }
 
-    public T Get<T>(Preference key)
+    public T? Get<T>(Preference key)
     {
         var metadata = _preferences[key];
         if (typeof(T) == metadata.DataType)
