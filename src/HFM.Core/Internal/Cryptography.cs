@@ -3,6 +3,9 @@ using System.Text;
 
 namespace HFM.Core.Internal;
 
+#if HFM_PREFERENCES
+[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+#endif
 internal class Cryptography
 {
     private string SymmetricKey { get; }
