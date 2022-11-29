@@ -342,7 +342,7 @@ public class XmlPreferencesProviderTests : IDisposable
         }
     }
 
-    private class DoesNotReadFromOrWriteToDiskXmlPreferencesProvider : XmlPreferencesProvider
+    private sealed class DoesNotReadFromOrWriteToDiskXmlPreferencesProvider : XmlPreferencesProvider
     {
         private PreferenceData _data;
 
