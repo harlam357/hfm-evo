@@ -4,7 +4,7 @@ using HFM.Preferences.Data;
 namespace HFM.Preferences;
 
 [TestFixture]
-public partial class PreferencesProviderTests : IDisposable
+public class XmlPreferencesProviderTests : IDisposable
 {
     private const string ApplicationVersion = "1.0.0.0";
     private const string NoApplicationVersion = "0.0.0.0";
@@ -25,7 +25,7 @@ public partial class PreferencesProviderTests : IDisposable
     }
 
     [TestFixture]
-    public class XmlPreferencesProviderConstructorArgumentValues : PreferencesProviderTests
+    public class XmlPreferencesProviderConstructorArgumentValues : XmlPreferencesProviderTests
     {
         private string? _applicationPath;
 
@@ -64,7 +64,7 @@ public partial class PreferencesProviderTests : IDisposable
     }
 
     [TestFixture]
-    public class GivenXmlPreferencesProvider : PreferencesProviderTests
+    public class GivenXmlPreferencesProvider : XmlPreferencesProviderTests
     {
         private string? _configPath;
 
@@ -287,46 +287,6 @@ public partial class PreferencesProviderTests : IDisposable
         }
     }
 
-    [TestFixture]
-    public class GivenInMemoryPreferencesProvider : PreferencesProviderTests
-    {
-        [SetUp]
-        public override void BeforeEach()
-        {
-            base.BeforeEach();
-
-            _preferences = new InMemoryPreferencesProvider(String.Empty, String.Empty, String.Empty);
-        }
-
-        [Test]
-        public void RoundTripsEncryptedPreference()
-        {
-            const string expected = "fizzbizz";
-            _preferences!.Set(Preference.WebGenPassword, expected);
-            Assert.That(_preferences!.Get<string>(Preference.WebGenPassword), Is.EqualTo(expected));
-        }
-
-        [Test]
-        public void RaisesPreferenceChanged()
-        {
-            object? sender = null;
-            PreferenceChangedEventArgs? args = null;
-            _preferences!.PreferenceChanged += (s, e) =>
-            {
-                sender = s;
-                args = e;
-            };
-
-            _preferences.Set(Preference.ColorLogFile, false);
-
-            Assert.Multiple(() =>
-            {
-                Assert.That(sender, Is.SameAs(_preferences));
-                Assert.That(args!.Preference, Is.EqualTo(Preference.ColorLogFile));
-            });
-        }
-    }
-
     private class DoesNotReadFromOrWriteToDiskXmlPreferencesProvider : XmlPreferencesProvider
     {
         private PreferenceData _data;
@@ -340,17 +300,5 @@ public partial class PreferencesProviderTests : IDisposable
         protected override PreferenceData OnRead() => _data;
 
         protected override void OnWrite(PreferenceData data) => _data = data;
-    }
-
-    private enum FtpMode
-    {
-        Default,
-        Passive
-    }
-
-    private enum BonusCalculation
-    {
-        Default,
-        DownloadTime
     }
 }

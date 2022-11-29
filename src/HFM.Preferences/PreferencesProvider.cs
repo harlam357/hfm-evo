@@ -17,12 +17,17 @@ public abstract class PreferencesProvider : IPreferences
     private PreferenceDictionary _preferences;
 
     protected PreferencesProvider(string applicationPath, string applicationDataFolderPath, string applicationVersion)
+        : this(applicationPath, applicationDataFolderPath, applicationVersion, new PreferenceData { ApplicationVersion = applicationVersion })
+    {
+
+    }
+
+    protected PreferencesProvider(string applicationPath, string applicationDataFolderPath, string applicationVersion, PreferenceData data)
     {
         ApplicationPath = applicationPath;
         ApplicationDataFolderPath = applicationDataFolderPath;
         ApplicationVersion = applicationVersion;
 
-        var data = new PreferenceData { ApplicationVersion = ApplicationVersion };
         _preferences = CreateDictionary(data);
     }
 

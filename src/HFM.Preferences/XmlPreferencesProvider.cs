@@ -34,6 +34,7 @@ public partial class XmlPreferencesProvider : PreferencesProvider
         return null;
     }
 
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     private void EnsureApplicationDataFolderExists()
     {
         if (!Directory.Exists(ApplicationDataFolderPath))
