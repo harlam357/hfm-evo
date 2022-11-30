@@ -120,9 +120,13 @@
       "hfm.core": {
         "type": "Project",
         "dependencies": {
+          "HFM.Preferences": "[1.0.0, )",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "[7.0.0, )",
           "protobuf-net": "[3.1.25, )"
         }
+      },
+      "hfm.preferences": {
+        "type": "Project"
       }
     }
   }

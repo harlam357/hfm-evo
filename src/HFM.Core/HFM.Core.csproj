@@ -9,4 +9,8 @@
     <PackageReference Include="protobuf-net" Version="3.1.25" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\HFM.Preferences\HFM.Preferences.csproj" />
+  </ItemGroup>
+
 </Project>
