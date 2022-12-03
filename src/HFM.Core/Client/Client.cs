@@ -2,6 +2,8 @@
 
 public interface IClient
 {
+    event EventHandler<ClientChangedEventArgs>? ClientChanged;
+
     ClientSettings? Settings { get; }
 
     bool Connected { get; }
@@ -16,6 +18,8 @@ internal interface ISetClientSettings
 
 public abstract class Client : IClient, ISetClientSettings
 {
+    public event EventHandler<ClientChangedEventArgs>? ClientChanged;
+
     public ClientSettings? Settings { get; protected set; }
 
     public virtual bool Connected { get; protected set; }
@@ -28,8 +32,30 @@ public abstract class Client : IClient, ISetClientSettings
     public void SetClientSettings(ClientSettings settings) => Settings = settings;
 }
 
-[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-public sealed class NullClient : Client
+public enum ClientChangedAction
 {
+    Invalidate
+}
 
+public sealed class ClientChangedEventArgs : EventArgs
+{
+    public ClientChangedAction Action { get; }
+
+    public ClientChangedEventArgs(ClientChangedAction action)
+    {
+        Action = action;
+    }
+}
+
+[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+public sealed class NullClient : Client, IDisposable
+{
+    public NullClient() : this(Guid.NewGuid()) { }
+
+    public NullClient(Guid guid)
+    {
+        Settings = new ClientSettings { Guid = guid };
+    }
+
+    public void Dispose() { }
 }

@@ -4,7 +4,12 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace HFM.Core.Client;
 
-public class ClientFactory
+public interface IClientFactory
+{
+    IClient? Create(ClientSettings settings);
+}
+
+public class ClientFactory : IClientFactory
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly IDictionary<ClientType, Type> _typeMappings;
@@ -50,4 +55,11 @@ public class ClientFactory
             throw new ArgumentException($"Client server (host) port {settings.Port} is not valid.", nameof(settings));
         }
     }
+}
+
+public sealed class NullClientFactory : IClientFactory
+{
+    public static NullClientFactory Instance { get; } = new();
+
+    public IClient? Create(ClientSettings settings) => new NullClient(settings.Guid);
 }
