@@ -9,6 +9,8 @@ public interface IClient
     bool Connected { get; }
 
     void Close();
+
+    Task Refresh();
 }
 
 internal interface ISetClientSettings
@@ -27,6 +29,10 @@ public abstract class Client : IClient, ISetClientSettings
     public void Close() => OnClose();
 
     protected virtual void OnClose() => Connected = false;
+
+    public Task Refresh() => OnRefresh();
+
+    protected virtual Task OnRefresh() => Task.CompletedTask;
 
     // ISetClientSettings
     public void SetClientSettings(ClientSettings settings) => Settings = settings;
@@ -50,11 +56,11 @@ public sealed class ClientChangedEventArgs : EventArgs
 [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 public sealed class NullClient : Client, IDisposable
 {
-    public NullClient() : this(Guid.NewGuid()) { }
+    public NullClient() : this(new ClientSettings { Guid = Guid.NewGuid() }) { }
 
-    public NullClient(Guid guid)
+    public NullClient(ClientSettings settings)
     {
-        Settings = new ClientSettings { Guid = guid };
+        Settings = settings;
     }
 
     public void Dispose() { }

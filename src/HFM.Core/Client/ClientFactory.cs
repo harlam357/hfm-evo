@@ -61,5 +61,5 @@ public sealed class NullClientFactory : IClientFactory
 {
     public static NullClientFactory Instance { get; } = new();
 
-    public IClient? Create(ClientSettings settings) => new NullClient(settings.Guid);
+    public IClient? Create(ClientSettings settings) => new NullClient(settings);
 }

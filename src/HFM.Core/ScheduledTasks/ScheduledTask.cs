@@ -2,7 +2,16 @@
 
 namespace HFM.Core.ScheduledTasks;
 
-public abstract class ScheduledTask : IDisposable
+public interface IScheduledTaskInfo
+{
+    string Name { get; }
+
+    bool Enabled { get; }
+
+    bool InProgress { get; }
+}
+
+public abstract class ScheduledTask : IScheduledTaskInfo, IDisposable
 {
     private readonly System.Timers.Timer _timer;
 

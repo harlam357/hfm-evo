@@ -126,6 +126,15 @@ public class ClientConfiguration : IEnumerable<IClient>
         }
     }
 
+    public void Refresh()
+    {
+        bool hasValues = _clientsDictionary.Count != 0;
+        if (hasValues)
+        {
+            OnClientConfigurationChanged(new ClientConfigurationChangedEventArgs(ClientConfigurationChangedAction.Refresh, null));
+        }
+    }
+
     private void KillClient(IClient client)
     {
         client.ClientChanged -= OnClientChanged;
@@ -154,7 +163,8 @@ public enum ClientConfigurationChangedAction
     Remove,
     Edit,
     Clear,
-    Invalidate
+    Invalidate,
+    Refresh
 }
 
 public sealed class ClientConfigurationChangedEventArgs : EventArgs
