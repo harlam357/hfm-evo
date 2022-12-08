@@ -2,6 +2,15 @@
   "version": 1,
   "dependencies": {
     "net7.0": {
+      "HFM.Client": {
+        "type": "Direct",
+        "requested": "[0.6.0, )",
+        "resolved": "0.6.0",
+        "contentHash": "RzE+hO4p8vQwLU+Ho6BImX1UMxjQNVEOG1C1V3VdJ2P7Is8Gsb++Ih7gCwxzKEE3IbHn33xpfIW1YCACXhS4EA==",
+        "dependencies": {
+          "Newtonsoft.Json": "11.0.1"
+        }
+      },
       "Microsoft.Extensions.DependencyInjection.Abstractions": {
         "type": "Direct",
         "requested": "[7.0.0, )",
@@ -16,6 +25,11 @@
         "dependencies": {
           "protobuf-net.Core": "3.1.25"
         }
+      },
+      "Newtonsoft.Json": {
+        "type": "Transitive",
+        "resolved": "11.0.1",
+        "contentHash": "pNN4l+J6LlpIvHOeNdXlwxv39NPJ2B5klz+Rd2UQZIx30Squ5oND1Yy3wEAUoKn0GPUj6Yxt9lxlYWQqfZcvKg=="
       },
       "protobuf-net.Core": {
         "type": "Transitive",

@@ -65,6 +65,14 @@
           "System.Diagnostics.EventLog": "6.0.0"
         }
       },
+      "HFM.Client": {
+        "type": "Transitive",
+        "resolved": "0.6.0",
+        "contentHash": "RzE+hO4p8vQwLU+Ho6BImX1UMxjQNVEOG1C1V3VdJ2P7Is8Gsb++Ih7gCwxzKEE3IbHn33xpfIW1YCACXhS4EA==",
+        "dependencies": {
+          "Newtonsoft.Json": "11.0.1"
+        }
+      },
       "Microsoft.CodeCoverage": {
         "type": "Transitive",
         "resolved": "17.4.0",
@@ -142,6 +150,7 @@
       "hfm.core": {
         "type": "Project",
         "dependencies": {
+          "HFM.Client": "[0.6.0, )",
           "HFM.Preferences": "[1.0.0, )",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "[7.0.0, )",
           "protobuf-net": "[3.1.25, )"

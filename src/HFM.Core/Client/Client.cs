@@ -10,7 +10,7 @@ public interface IClient
 
     void Close();
 
-    Task Refresh();
+    Task Refresh(CancellationToken cancellationToken = default);
 }
 
 internal interface ISetClientSettings
@@ -22,6 +22,9 @@ public abstract class Client : IClient, ISetClientSettings
 {
     public event EventHandler<ClientChangedEventArgs>? ClientChanged;
 
+    protected virtual void OnClientChanged(ClientChangedEventArgs args) =>
+        ClientChanged?.Invoke(this, args);
+
     public ClientSettings? Settings { get; protected set; }
 
     public virtual bool Connected { get; protected set; }
@@ -30,8 +33,46 @@ public abstract class Client : IClient, ISetClientSettings
 
     protected virtual void OnClose() => Connected = false;
 
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-    public Task Refresh() => OnRefresh();
+    private int _retrieveLock;
+
+    public async Task Refresh(CancellationToken cancellationToken = default)
+    {
+        if (ClientCannotRefresh())
+        {
+            return;
+        }
+
+        if (Interlocked.CompareExchange(ref _retrieveLock, 1, 0) != 0)
+        {
+            return;
+        }
+
+        try
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            if (!Connected)
+            {
+                await OnConnect().ConfigureAwait(false);
+            }
+
+            await OnRefresh().ConfigureAwait(false);
+        }
+        finally
+        {
+            OnClientChanged(new ClientChangedEventArgs(ClientChangedAction.Invalidate));
+
+            Interlocked.Exchange(ref _retrieveLock, 0);
+        }
+    }
+
+    private bool ClientCannotRefresh() => Settings is { Disabled: true };
+
+    protected virtual Task OnConnect()
+    {
+        Connected = true;
+        return Task.CompletedTask;
+    }
 
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     protected virtual Task OnRefresh() => Task.CompletedTask;

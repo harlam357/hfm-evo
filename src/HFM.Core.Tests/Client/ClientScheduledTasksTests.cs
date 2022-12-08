@@ -66,7 +66,7 @@ public class ClientScheduledTasksTests : IDisposable
                 foreach (var client in _configuration!)
                 {
                     var mockClient = Mock.Get(client);
-                    mockClient.Verify(x => x!.Refresh(), Times.Once);
+                    mockClient.Verify(x => x!.Refresh(It.IsAny<CancellationToken>()), Times.Once);
                 }
             }
         }
@@ -93,7 +93,7 @@ public class ClientScheduledTasksTests : IDisposable
             {
                 var client = _configuration!.First();
                 var mockClient = Mock.Get(client);
-                mockClient.Verify(x => x!.Refresh(), Times.Once);
+                mockClient.Verify(x => x!.Refresh(It.IsAny<CancellationToken>()), Times.Once);
             }
         }
 
@@ -125,7 +125,7 @@ public class ClientScheduledTasksTests : IDisposable
             {
                 var client = _configuration!.First();
                 var mockClient = Mock.Get(client);
-                mockClient.Verify(x => x!.Refresh(), Times.Once);
+                mockClient.Verify(x => x!.Refresh(It.IsAny<CancellationToken>()), Times.Once);
             }
         }
 
@@ -194,8 +194,8 @@ public class ClientScheduledTasksTests : IDisposable
                 foreach (var client in _configuration!)
                 {
                     var mockClient = Mock.Get(client);
-                    mockClient.Verify(x => x!.Refresh(), Times.AtLeastOnce);
-                    mockClient.Verify(x => x!.Refresh(), Times.AtMost(2));
+                    mockClient.Verify(x => x!.Refresh(It.IsAny<CancellationToken>()), Times.AtLeastOnce);
+                    mockClient.Verify(x => x!.Refresh(It.IsAny<CancellationToken>()), Times.AtMost(2));
                 }
             }
         }
@@ -577,8 +577,8 @@ public class ClientScheduledTasksTests : IDisposable
             foreach (var client in _configuration!)
             {
                 var mockClient = Mock.Get(client);
-                mockClient.Verify(x => x!.Refresh(), Times.AtLeastOnce);
-                mockClient.Verify(x => x!.Refresh(), Times.AtMost(2));
+                mockClient.Verify(x => x!.Refresh(It.IsAny<CancellationToken>()), Times.AtLeastOnce);
+                mockClient.Verify(x => x!.Refresh(It.IsAny<CancellationToken>()), Times.AtMost(2));
             }
         }
     }
@@ -604,7 +604,7 @@ public class ClientScheduledTasksTests : IDisposable
         _clientScheduledTasks?.Dispose();
     }
 
-    private class MockClientFactory : IClientFactory
+    private sealed class MockClientFactory : IClientFactory
     {
         public static MockClientFactory Instance { get; } = new();
 

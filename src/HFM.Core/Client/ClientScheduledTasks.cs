@@ -188,7 +188,7 @@ public class ClientScheduledTasks : IDisposable
         Parallel.ForEach(clients, x =>
         {
             ct.ThrowIfCancellationRequested();
-            x.Refresh();
+            x.Refresh(ct);
         });
 
         if (RunWebArtifactsTaskAfterClientRefreshTask)
