@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using HFM.Core.Logging;
+
+using Microsoft.Extensions.DependencyInjection;
 
 namespace HFM.Core.Client;
 
@@ -11,6 +13,7 @@ public class ClientFactoryTests
     public void BeforeEach()
     {
         var services = new ServiceCollection();
+        services.AddSingleton<ILogger>(NullLogger.Instance);
         services.AddTransient<FahClient>();
         var serviceProvider = services.BuildServiceProvider();
 
