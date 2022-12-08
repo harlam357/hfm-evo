@@ -243,7 +243,7 @@ public class DelegateScheduledTaskTests
 
     private static void TaskChanged(object? sender, ScheduledTaskChangedEventArgs e) => Logger.Debug(e.ToString()!);
 
-    private class DelegateScheduledTaskWithRunCount : DelegateScheduledTask
+    private sealed class DelegateScheduledTaskWithRunCount : DelegateScheduledTask
     {
         public DelegateScheduledTaskWithRunCount(string name, double interval, Action<CancellationToken> action) : base(name, interval, action)
         {
