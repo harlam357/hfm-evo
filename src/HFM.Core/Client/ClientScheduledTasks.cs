@@ -205,12 +205,6 @@ public class ClientScheduledTasks : IDisposable
         _webArtifactDeployment.Deploy(ct);
     }
 
-    public static bool ValidateInterval(int interval) =>
-        MinInterval <= interval && interval <= MaxInterval;
-
-    public const int MinInterval = 1;
-    public const int MaxInterval = 180;
-
     public void Dispose()
     {
         Dispose(true);

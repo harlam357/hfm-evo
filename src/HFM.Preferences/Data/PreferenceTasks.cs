@@ -21,6 +21,12 @@ public record ClientRetrievalTask()
 
     [DataMember]
     public string? ProcessingMode { get; set; }
+
+    //public static bool Validate(ClientRetrievalTask task) =>
+    //    task.Interval is >= MinInterval and <= MaxInterval;
+
+    //public const int MinInterval = 1;
+    //public const int MaxInterval = 180;
 }
 
 [DataContract(Namespace = "")]
@@ -42,4 +48,10 @@ public record WebGenerationTask()
 
     [DataMember]
     public bool AfterClientRetrieval { get; set; }
+
+    //public static bool Validate(WebGenerationTask task) =>
+    //    task.Interval is >= MinInterval and <= MaxInterval;
+
+    //public const int MinInterval = 1;
+    //public const int MaxInterval = 180;
 }

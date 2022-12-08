@@ -30,8 +30,10 @@ public abstract class Client : IClient, ISetClientSettings
 
     protected virtual void OnClose() => Connected = false;
 
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public Task Refresh() => OnRefresh();
 
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     protected virtual Task OnRefresh() => Task.CompletedTask;
 
     // ISetClientSettings
