@@ -33,7 +33,7 @@ public abstract class Client : IClient, ISetClientSettings
 
     protected virtual void OnClose() => Connected = false;
 
-    private int _retrieveLock;
+    private int _refreshLock;
 
     public async Task Refresh(CancellationToken cancellationToken = default)
     {
@@ -42,7 +42,7 @@ public abstract class Client : IClient, ISetClientSettings
             return;
         }
 
-        if (Interlocked.CompareExchange(ref _retrieveLock, 1, 0) != 0)
+        if (Interlocked.CompareExchange(ref _refreshLock, 1, 0) != 0)
         {
             return;
         }
@@ -62,7 +62,7 @@ public abstract class Client : IClient, ISetClientSettings
         {
             OnClientChanged(new ClientChangedEventArgs(ClientChangedAction.Invalidate));
 
-            Interlocked.Exchange(ref _retrieveLock, 0);
+            Interlocked.Exchange(ref _refreshLock, 0);
         }
     }
 
