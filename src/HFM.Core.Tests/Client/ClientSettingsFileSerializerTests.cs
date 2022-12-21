@@ -71,7 +71,7 @@ public class ClientSettingsFileSerializerTests
 
             using var artifacts = new ArtifactFolder();
             string path = artifacts.GetRandomFilePath();
-            File.Copy("TestFiles\\ClientSettings_0_9_11.hfmx", path);
+            File.Copy(Path.Combine(TestFiles.ProjectPath, "ClientSettings_0_9_11.hfmx"), path);
             _settingsCollection = _serializer!.Deserialize(path);
         }
 
@@ -104,7 +104,7 @@ public class ClientSettingsFileSerializerTests
 
             using var artifacts = new ArtifactFolder();
             string path = artifacts.GetRandomFilePath();
-            File.Copy("TestFiles\\ClientSettings_0_9_11.hfmx", path);
+            File.Copy(Path.Combine(TestFiles.ProjectPath, "ClientSettings_0_9_11.hfmx"), path);
 
             var settingsRootNode = XElement.Load(path);
             foreach (var item in settingsRootNode.Descendants("ClientSettings"))
