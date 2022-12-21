@@ -39,10 +39,7 @@ public class FahClient : Client
     {
         await CreateAndOpenConnection().ConfigureAwait(false);
 
-        if (ReadMessagesTask is not null)
-        {
-            ReadMessagesTask.Dispose();
-        }
+        ReadMessagesTask?.Dispose();
 
         ReadMessagesTask = Task.Run(async () =>
         {
