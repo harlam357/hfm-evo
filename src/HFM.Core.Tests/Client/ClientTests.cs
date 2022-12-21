@@ -55,7 +55,7 @@ public class ClientTests
         {
             var mockClient = (MockClient)_client!;
             TestLogger.Instance.Info($"Retrieve Count: {mockClient.RefreshCount}");
-            Assert.That(mockClient.RefreshCount, Is.LessThan(MaxThreads));
+            Assert.That(mockClient.RefreshCount, Is.LessThanOrEqualTo(MaxThreads));
         }
     }
 }
