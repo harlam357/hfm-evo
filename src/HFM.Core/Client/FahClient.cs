@@ -9,6 +9,8 @@ public class FahClient : Client
 {
     protected FahClientConnection? Connection { get; set; }
 
+    protected FahClientMessageBuffer MessageBuffer { get; set; }
+
     public override bool Connected => Connection is { Connected: true };
 
     private readonly ILogger _logger;
@@ -16,6 +18,8 @@ public class FahClient : Client
     public FahClient(ILogger? logger)
     {
         _logger = logger ?? NullLogger.Instance;
+
+        MessageBuffer = new FahClientMessageBuffer();
     }
 
     protected override void OnClose()
@@ -31,6 +35,41 @@ public class FahClient : Client
                 _logger.Error(ex, Logger.NameFormat, Settings!.Name, ex.Message);
             }
         }
+
+        // TODO: Clear the MessageBuffer
+    }
+
+    protected FahClientMessages? Messages { get; set; }
+
+    protected override async Task OnRefresh()
+    {
+        Messages = MessageBuffer.Empty();
+        if (IsHeartbeatOverdue(Messages.Heartbeat))
+        {
+            Close();
+        }
+
+        await OnProcessMessages().ConfigureAwait(false);
+    }
+
+    private static bool IsHeartbeatOverdue(FahClientMessage? heartbeat)
+    {
+        if (heartbeat is null)
+        {
+            return false;
+        }
+
+        var minutesSinceLastHeartbeat = DateTime.UtcNow.Subtract(heartbeat.Identifier.Received).TotalMinutes;
+        var maximumMinutesBetweenHeartbeats = TimeSpan.FromSeconds(HeartbeatInterval * 3).TotalMinutes;
+
+        return minutesSinceLastHeartbeat > maximumMinutesBetweenHeartbeats;
+    }
+
+    private Task OnProcessMessages()
+    {
+        var messages = Messages;
+        // TODO: process the messages
+        return Task.CompletedTask;
     }
 
     protected Task? ReadMessagesTask { get; private set; }
@@ -80,7 +119,7 @@ public class FahClient : Client
         }
     }
 
-    public const int HeartbeatInterval = 60;
+    private const int HeartbeatInterval = 60;
 
     private async Task ExecuteUpdatesCommands()
     {
@@ -118,5 +157,22 @@ public class FahClient : Client
         }
     }
 
-    protected virtual Task OnMessageRead(FahClientMessage message) => Task.CompletedTask;
+    private static readonly string[] _RefreshMessageTypes =
+    {
+        FahClientMessageType.Info,
+        FahClientMessageType.Options,
+        FahClientMessageType.SlotInfo,
+        FahClientMessageType.SlotOptions,
+        FahClientMessageType.QueueInfo
+    };
+
+    protected virtual async Task OnMessageRead(FahClientMessage message)
+    {
+        MessageBuffer.Add(message);
+
+        if (MessageBuffer.ContainsAny(_RefreshMessageTypes))
+        {
+            await Refresh().ConfigureAwait(false);
+        }
+    }
 }

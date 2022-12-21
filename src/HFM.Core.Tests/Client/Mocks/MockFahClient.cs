@@ -12,52 +12,53 @@ public class MockFahClient : FahClient
         Settings = settings;
     }
 
-    private Exception? _closeException;
+    public int CloseCount { get; private set; }
 
-    public MockFahClient ThrowsOnClose(Exception exception)
+    protected override void OnClose()
     {
-        _closeException = exception;
-        return this;
+        CloseCount++;
+        base.OnClose();
     }
 
     public new Task? ReadMessagesTask => base.ReadMessagesTask;
 
     protected override FahClientConnection OnCreateConnection()
     {
-        var connection = new MockFahClientConnection().HasMessages(_messages);
-        if (_closeException is not null)
+        var connection = new MockFahClientConnection().HasMessages(_hasMessages);
+        if (_connectionCloseException is not null)
         {
-            connection.CloseThrows(_closeException);
+            connection.CloseThrows(_connectionCloseException);
         }
-        if (_refreshException is not null)
+        if (_messageReaderReadException is not null)
         {
-            connection.ReaderThrows(_refreshException);
+            connection.ReaderThrows(_messageReaderReadException);
         }
         return connection;
     }
 
-    private readonly List<FahClientMessage> _messages = new();
+    private readonly List<FahClientMessage> _hasMessages = new();
 
     public MockFahClient HasMessages(params FahClientMessage[] messages)
     {
-        _messages.AddRange(messages);
+        _hasMessages.AddRange(messages);
         return this;
     }
 
-    private Exception? _refreshException;
+    private Exception? _connectionCloseException;
 
-    public MockFahClient ThrowsOnRefresh(Exception exception)
+    public MockFahClient ConnectionThrowsOnClose(Exception exception)
     {
-        _refreshException = exception;
+        _connectionCloseException = exception;
         return this;
     }
 
-    public ICollection<FahClientMessage> MessagesRead { get; } = new List<FahClientMessage>();
+    private Exception? _messageReaderReadException;
 
-    protected override async Task OnMessageRead(FahClientMessage message)
+    public MockFahClient MessageReaderThrowsOnRead(Exception exception)
     {
-        MessagesRead.Add(message);
-
-        await base.OnMessageRead(message);
+        _messageReaderReadException = exception;
+        return this;
     }
+
+    public new FahClientMessages? Messages => base.Messages;
 }

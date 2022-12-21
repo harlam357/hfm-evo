@@ -13,6 +13,41 @@ public class FahClientTests
 {
     private FahClient? _client;
 
+    [TestFixture]
+    public class GivenClientMessages : FahClientTests
+    {
+        [SetUp]
+        public virtual void BeforeEach()
+        {
+            var mockClient = new MockFahClient(new ClientSettings())
+                .HasMessages(
+                    FahClientMessageFileReader.ReadAllMessages(
+                        Path.Combine(TestFiles.SolutionPath, "Client_v7_19")).ToArray());
+            _client = mockClient;
+        }
+
+        [Test]
+        public async Task RefreshReadsAllMessages()
+        {
+            await _client!.Refresh();
+
+            var mockClient = GetMockFahClient(_client!);
+            await mockClient.ReadMessagesTask!;
+
+            var messages = mockClient.Messages!;
+            Assert.Multiple(() =>
+            {
+                Assert.That(messages.ProcessedMessages, Has.Count.GreaterThanOrEqualTo(1));
+                Assert.That(messages.Heartbeat, Is.Null);
+                Assert.That(messages.Info, Is.Not.Null);
+                Assert.That(messages.Options, Is.Not.Null);
+                Assert.That(messages.SlotCollection, Has.Count.EqualTo(2));
+                Assert.That(messages.UnitCollection, Has.Count.EqualTo(1));
+            });
+        }
+    }
+
+    [TestFixture]
     public class GivenClientIsNotDisabled : FahClientTests
     {
         [SetUp]
@@ -21,8 +56,10 @@ public class FahClientTests
             var mockClient = new MockFahClient(new ClientSettings())
                 .HasMessages(
                     new FahClientMessage(
-                        new FahClientMessageIdentifier(FahClientMessageType.Heartbeat, DateTime.Now),
-                        new StringBuilder()));
+                        new FahClientMessageIdentifier(FahClientMessageType.Heartbeat, DateTime.UtcNow),
+                        new StringBuilder()),
+                    FahClientMessageFileReader.ReadMessage(
+                        Path.Combine(TestFiles.SolutionPath, "Client_v7_19", "info-20210905T085332.txt")));
             _client = mockClient;
         }
 
@@ -41,7 +78,7 @@ public class FahClientTests
             var mockClient = GetMockFahClient(_client!);
             await mockClient.ReadMessagesTask!;
 
-            Assert.That(mockClient.MessagesRead, Has.Count.GreaterThanOrEqualTo(1));
+            Assert.That(mockClient.Messages!.ProcessedMessages, Has.Count.GreaterThanOrEqualTo(1));
         }
 
         [Test]
@@ -56,6 +93,42 @@ public class FahClientTests
         }
     }
 
+    [TestFixture]
+    public class GivenHeartbeatIsOverdue : FahClientTests
+    {
+        [SetUp]
+        public virtual void BeforeEach()
+        {
+            var maximumMinutesBetweenHeartbeats = TimeSpan.FromMinutes(3);
+
+            var mockClient = new MockFahClient(new ClientSettings())
+                .HasMessages(
+                    new FahClientMessage(
+                        new FahClientMessageIdentifier(FahClientMessageType.Heartbeat, DateTime.UtcNow.Subtract(maximumMinutesBetweenHeartbeats)),
+                        new StringBuilder()),
+                    FahClientMessageFileReader.ReadMessage(
+                        Path.Combine(TestFiles.SolutionPath, "Client_v7_19", "info-20210905T085332.txt")));
+            _client = mockClient;
+        }
+
+        [Test]
+        public async Task RefreshClosesTheClientConnection()
+        {
+            await _client!.Refresh();
+
+            var mockClient = GetMockFahClient(_client!);
+            await mockClient.ReadMessagesTask!;
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(_client.Connected, Is.False);
+                // Close() called by OnRefresh() and completion of ReadMessagesTask
+                Assert.That(mockClient.CloseCount, Is.EqualTo(2));
+            });
+        }
+    }
+
+    [TestFixture]
     public class GivenClientIsDisabled : FahClientTests
     {
         [SetUp]
@@ -70,6 +143,7 @@ public class FahClientTests
         }
     }
 
+    [TestFixture]
     public class GivenClientSettingsHasPassword : FahClientTests
     {
         [SetUp]
@@ -85,7 +159,8 @@ public class FahClientTests
         }
     }
 
-    private class GivenMessageReaderThrowsObjectDisposedException : FahClientTests
+    [TestFixture]
+    public class GivenMessageReaderThrowsObjectDisposedExceptionOnRefresh : FahClientTests
     {
         private ILogger? _logger;
 
@@ -94,7 +169,7 @@ public class FahClientTests
         {
             _logger = Mock.Of<ILogger>();
             var mockClient = new MockFahClient(new ClientSettings(), _logger)
-                .ThrowsOnRefresh(new ObjectDisposedException(""));
+                .MessageReaderThrowsOnRead(new ObjectDisposedException(""));
             _client = mockClient;
         }
 
@@ -111,7 +186,8 @@ public class FahClientTests
         }
     }
 
-    private class GivenMessageReaderThrowsUnexpectedException : FahClientTests
+    [TestFixture]
+    public class GivenMessageReaderThrowsUnexpectedExceptionOnRefresh : FahClientTests
     {
         private ILogger? _logger;
 
@@ -120,7 +196,7 @@ public class FahClientTests
         {
             _logger = Mock.Of<ILogger>();
             var mockClient = new MockFahClient(new ClientSettings(), _logger)
-                .ThrowsOnRefresh(new InvalidOperationException(""));
+                .MessageReaderThrowsOnRead(new InvalidOperationException(""));
             _client = mockClient;
         }
 
@@ -137,7 +213,8 @@ public class FahClientTests
         }
     }
 
-    private class GivenConnectionThrowsOnClose : FahClientTests
+    [TestFixture]
+    public class GivenConnectionThrowsOnClose : FahClientTests
     {
         private ILogger? _logger;
 
@@ -146,7 +223,7 @@ public class FahClientTests
         {
             _logger = Mock.Of<ILogger>();
             var mockClient = new MockFahClient(new ClientSettings(), _logger)
-                .ThrowsOnClose(new InvalidOperationException(""));
+                .ConnectionThrowsOnClose(new InvalidOperationException(""));
             _client = mockClient;
         }
 
