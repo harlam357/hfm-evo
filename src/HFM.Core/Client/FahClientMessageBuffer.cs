@@ -57,6 +57,10 @@ public class FahClientMessageBuffer
             case FahClientMessageType.QueueInfo:
                 _messages = _messages with { UnitCollection = UnitCollection.Load(message.MessageText) };
                 break;
+            case FahClientMessageType.LogRestart:
+            case FahClientMessageType.LogUpdate:
+                // TODO: Handle LogRestart and LogUpdate messages
+                break;
             // ReSharper disable once RedundantEmptySwitchSection
             default:
                 break;

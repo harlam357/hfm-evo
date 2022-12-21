@@ -1,0 +1,65 @@
+trigger:
+- main
+- feature/*
+
+stages:
+- stage: Build
+  jobs:
+  - job: Build
+
+    variables:
+      solution: '**/HFM.sln'
+      buildProjects: '**/*.csproj'
+      testProjects: '**/*.Tests.csproj'
+      buildConfiguration: 'Release'
+      dotnetWindows: 'net7.0-windows'
+      dotnet: 'net7.0'
+
+    steps:
+    - task: UseDotNet@2
+      inputs:
+        packageType: 'sdk'
+        version: '7.0.x'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Restore'
+      inputs:
+        command: 'restore'
+        projects: '$(solution)'
+        restoreArguments: '--locked-mode'
+        verbosityRestore: 'Normal'
+        
+    - task: DotNetCoreCLI@2
+      displayName: 'Build'
+      inputs:
+        command: 'build'
+        projects: '$(buildProjects)'
+        arguments: '-c $(buildConfiguration) --verbosity normal --no-incremental --no-restore'
+    
+    - task: DotNetCoreCLI@2
+      displayName: 'Test'
+      inputs:
+        command: 'test'
+        projects: '$(testProjects)'
+        arguments: '--no-build -c $(buildConfiguration) --collect:"XPlat Code Coverage" --logger "console;verbosity=detailed"'
+
+    - task: PublishCodeCoverageResults@1
+      displayName: 'Publish Code Coverage'
+      inputs:
+        codeCoverageTool: 'Cobertura'
+        summaryFileLocation: '$(Agent.TempDirectory)\**\coverage.cobertura.xml'
+
+    - task: CopyFiles@2
+      displayName: 'Copy to Artifact Staging'
+      inputs:
+        SourceFolder: '$(System.DefaultWorkingDirectory)'
+        Contents: |
+          src\Artifacts\**
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Artifacts'
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
