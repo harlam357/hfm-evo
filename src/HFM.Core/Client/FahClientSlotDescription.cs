@@ -28,7 +28,7 @@ public abstract class FahClientSlotDescription
                 : FahClientSlotType.Cpu;
 }
 
-public class FahClientGpuSlotDescription : FahClientSlotDescription
+public partial class FahClientGpuSlotDescription : FahClientSlotDescription
 {
     public override FahClientSlotType SlotType => FahClientSlotType.Gpu;
 
@@ -54,9 +54,12 @@ public class FahClientGpuSlotDescription : FahClientSlotDescription
         return d;
     }
 
+    [GeneratedRegex("gpu\\:(?<GPUBus>\\d+)\\:(?<GPUSlot>\\d+)", RegexOptions.IgnoreCase | RegexOptions.Singleline, "en-US")]
+    private static partial Regex GpuBusAndSlotRegex();
+
     private bool SetGpuBusAndSlot(string description)
     {
-        var match = Regex.Match(description, @"gpu\:(?<GPUBus>\d+)\:(?<GPUSlot>\d+)", RegexOptions.Singleline | RegexOptions.IgnoreCase);
+        var match = GpuBusAndSlotRegex().Match(description);
         if (match.Success &&
             Int32.TryParse(match.Groups["GPUBus"].Value, out var bus) &&
             Int32.TryParse(match.Groups["GPUSlot"].Value, out var slot))
@@ -69,9 +72,12 @@ public class FahClientGpuSlotDescription : FahClientSlotDescription
         return false;
     }
 
+    [GeneratedRegex("gpu\\:(?<GPUDevice>\\d+)", RegexOptions.IgnoreCase | RegexOptions.Singleline, "en-US")]
+    private static partial Regex DeviceRegex();
+
     private void SetDevice(string description)
     {
-        var match = Regex.Match(description, @"gpu\:(?<GPUDevice>\d+)", RegexOptions.Singleline | RegexOptions.IgnoreCase);
+        var match = DeviceRegex().Match(description);
         if (match.Success &&
             Int32.TryParse(match.Groups["GPUDevice"].Value, out var device))
         {
@@ -79,16 +85,22 @@ public class FahClientGpuSlotDescription : FahClientSlotDescription
         }
     }
 
+    [GeneratedRegex("gpu\\:\\d+\\:\\d+ (?<GPUPrefix>.+) \\[", RegexOptions.IgnoreCase | RegexOptions.Singleline, "en-US")]
+    private static partial Regex GpuBusAndSlotPrefixRegex();
+
+    [GeneratedRegex("gpu\\:\\d+\\:(?<GPUPrefix>.+) \\[", RegexOptions.IgnoreCase | RegexOptions.Singleline, "en-US")]
+    private static partial Regex GpuDevicePrefixRegex();
+
     private void SetGpuPrefix(string description)
     {
-        var match = Regex.Match(description, @"gpu\:\d+\:\d+ (?<GPUPrefix>.+) \[", RegexOptions.Singleline | RegexOptions.IgnoreCase);
+        var match = GpuBusAndSlotPrefixRegex().Match(description);
         if (match.Success)
         {
             GpuPrefix = match.Groups["GPUPrefix"].Value;
         }
         else
         {
-            match = Regex.Match(description, @"gpu\:\d+\:(?<GPUPrefix>.+) \[", RegexOptions.Singleline | RegexOptions.IgnoreCase);
+            match = GpuDevicePrefixRegex().Match(description);
             if (match.Success)
             {
                 GpuPrefix = match.Groups["GPUPrefix"].Value;
@@ -96,9 +108,12 @@ public class FahClientGpuSlotDescription : FahClientSlotDescription
         }
     }
 
+    [GeneratedRegex("\\[(?<GPU>.+)\\]", RegexOptions.Singleline)]
+    private static partial Regex ProcessorRegex();
+
     private void SetProcessor(string description)
     {
-        var match = Regex.Match(description, "\\[(?<GPU>.+)\\]", RegexOptions.Singleline);
+        var match = ProcessorRegex().Match(description);
         if (match.Success)
         {
             Processor = match.Groups["GPU"].Value;
@@ -106,7 +121,7 @@ public class FahClientGpuSlotDescription : FahClientSlotDescription
     }
 }
 
-public class FahClientCpuSlotDescription : FahClientSlotDescription
+public partial class FahClientCpuSlotDescription : FahClientSlotDescription
 {
     public override FahClientSlotType SlotType => FahClientSlotType.Cpu;
 
@@ -124,9 +139,12 @@ public class FahClientCpuSlotDescription : FahClientSlotDescription
         return d;
     }
 
+    [GeneratedRegex("[cpu|smp]\\:(?<CPUThreads>\\d+)", RegexOptions.IgnoreCase | RegexOptions.Singleline, "en-US")]
+    private static partial Regex CpuThreadsRegex();
+
     private void SetCpuThreads(string description)
     {
-        var match = Regex.Match(description, @"[cpu|smp]\:(?<CPUThreads>\d+)", RegexOptions.Singleline | RegexOptions.IgnoreCase);
+        var match = CpuThreadsRegex().Match(description);
         if (match.Success && Int32.TryParse(match.Groups["CPUThreads"].Value, out var threads))
         {
             CpuThreads = threads;
