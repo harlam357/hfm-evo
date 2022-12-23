@@ -9,8 +9,6 @@ public class FahClient : Client
 {
     protected FahClientConnection? Connection { get; set; }
 
-    protected FahClientMessageBuffer MessageBuffer { get; set; }
-
     public override bool Connected => Connection is { Connected: true };
 
     private readonly ILogger _logger;
@@ -18,8 +16,6 @@ public class FahClient : Client
     public FahClient(ILogger? logger)
     {
         _logger = logger ?? NullLogger.Instance;
-
-        MessageBuffer = new FahClientMessageBuffer();
     }
 
     protected override void OnClose()
@@ -36,10 +32,18 @@ public class FahClient : Client
             }
         }
 
-        // TODO: Clear the MessageBuffer
+        ClearMessages();
     }
 
-    protected FahClientMessages? Messages { get; set; }
+    public FahClientMessages? Messages { get; protected set; }
+
+    protected FahClientMessageBuffer MessageBuffer { get; set; } = new();
+
+    private void ClearMessages()
+    {
+        Messages = null;
+        MessageBuffer = new FahClientMessageBuffer();
+    }
 
     protected override async Task OnRefresh()
     {

@@ -34,7 +34,7 @@ public class FahClientTests
             var mockClient = GetMockFahClient(_client!);
             await mockClient.ReadMessagesTask!;
 
-            var messages = mockClient.Messages!;
+            var messages = mockClient.LastMessages!;
             Assert.Multiple(() =>
             {
                 Assert.That(messages.ProcessedMessages, Has.Count.GreaterThanOrEqualTo(1));
@@ -45,6 +45,18 @@ public class FahClientTests
                 Assert.That(messages.UnitCollection, Has.Count.EqualTo(1));
                 Assert.That(messages.ClientRun, Is.Not.Null);
             });
+        }
+
+        [Test]
+        public async Task MessagesAreClearedOnClose()
+        {
+            await _client!.Refresh();
+
+            var mockClient = GetMockFahClient(_client!);
+            await mockClient.ReadMessagesTask!;
+
+            _client!.Close();
+            Assert.That(_client!.Messages, Is.Null);
         }
     }
 
@@ -79,7 +91,7 @@ public class FahClientTests
             var mockClient = GetMockFahClient(_client!);
             await mockClient.ReadMessagesTask!;
 
-            Assert.That(mockClient.Messages!.ProcessedMessages, Has.Count.GreaterThanOrEqualTo(1));
+            Assert.That(mockClient.LastMessages!.ProcessedMessages, Has.Count.GreaterThanOrEqualTo(1));
         }
 
         [Test]

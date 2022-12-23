@@ -20,6 +20,14 @@ public class MockFahClient : FahClient
         base.OnClose();
     }
 
+    public FahClientMessages? LastMessages { get; private set; }
+
+    protected override async Task OnRefresh()
+    {
+        await base.OnRefresh();
+        LastMessages = Messages;
+    }
+
     public new Task? ReadMessagesTask => base.ReadMessagesTask;
 
     protected override FahClientConnection OnCreateConnection()
@@ -59,6 +67,4 @@ public class MockFahClient : FahClient
         _messageReaderReadException = exception;
         return this;
     }
-
-    public new FahClientMessages? Messages => base.Messages;
 }
