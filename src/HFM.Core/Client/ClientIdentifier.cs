@@ -5,7 +5,7 @@ using HFM.Core.Net;
 
 namespace HFM.Core.Client;
 
-public readonly struct ClientIdentifier : IEquatable<ClientIdentifier>, IComparable<ClientIdentifier>, IComparable
+public readonly partial struct ClientIdentifier : IEquatable<ClientIdentifier>, IComparable<ClientIdentifier>, IComparable
 {
     public ClientIdentifier(string? name, string? server, int port, Guid guid)
     {
@@ -98,11 +98,12 @@ public readonly struct ClientIdentifier : IEquatable<ClientIdentifier>, ICompara
             ? String.Format(CultureInfo.InvariantCulture, "{0}:{1}", Server, Port)
             : Server;
 
-    internal static readonly Regex ServerPortRegex = new(@"(?<Server>.+)[-:](?<Port>\d+)$", RegexOptions.ExplicitCapture);
+    [GeneratedRegex("(?<Server>.+)[-:](?<Port>\\d+)$", RegexOptions.ExplicitCapture)]
+    private static partial Regex FromConnectionStringRegex();
 
     public static ClientIdentifier FromConnectionString(string name, string? connectionString, Guid guid)
     {
-        var match = connectionString is null ? null : ServerPortRegex.Match(connectionString);
+        var match = connectionString is null ? null : FromConnectionStringRegex().Match(connectionString);
         return match is { Success: true }
             ? new ClientIdentifier(name, match.Groups["Server"].Value, Convert.ToInt32(match.Groups["Port"].Value, CultureInfo.InvariantCulture), guid)
             : new ClientIdentifier(name, connectionString, ClientSettings.NoPort, guid);
