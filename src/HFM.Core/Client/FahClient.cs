@@ -43,7 +43,7 @@ public class FahClient : Client
 
     protected override async Task OnRefresh()
     {
-        Messages = MessageBuffer.Empty();
+        Messages = await MessageBuffer.Empty();
         if (IsHeartbeatOverdue(Messages.Heartbeat))
         {
             Close();

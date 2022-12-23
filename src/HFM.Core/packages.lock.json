@@ -11,6 +11,12 @@
           "Newtonsoft.Json": "11.0.1"
         }
       },
+      "HFM.Log": {
+        "type": "Direct",
+        "requested": "[0.4.0, )",
+        "resolved": "0.4.0",
+        "contentHash": "Lb0QT05Bu8PctDeMZ6yQPtSn4HLyZG/FQf1mCfAMPFa2N07dRWDRfhFFdQlF7+soX+yyChdDqXWSsIrsy6he/g=="
+      },
       "Microsoft.Extensions.DependencyInjection.Abstractions": {
         "type": "Direct",
         "requested": "[7.0.0, )",

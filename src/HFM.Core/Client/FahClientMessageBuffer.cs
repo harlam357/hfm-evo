@@ -1,7 +1,9 @@
 ﻿using System.Collections.Concurrent;
+using System.Text;
 
 using HFM.Client;
 using HFM.Client.ObjectModel;
+using HFM.Log;
 
 namespace HFM.Core.Client;
 
@@ -22,20 +24,20 @@ public class FahClientMessageBuffer
 
     private FahClientMessages _messages = new();
 
-    public FahClientMessages Empty()
+    public async Task<FahClientMessages> Empty()
     {
         var processedMessages = new List<FahClientMessage>();
 
         while (_messageQueue.TryDequeue(out FahClientMessage? message))
         {
             processedMessages.Add(message);
-            UpdateMessages(message);
+            await UpdateMessages(message);
         }
 
         return _messages with { ProcessedMessages = processedMessages };
     }
 
-    private void UpdateMessages(FahClientMessage message)
+    private async Task UpdateMessages(FahClientMessage message)
     {
         switch (message.Identifier.MessageType)
         {
@@ -59,7 +61,7 @@ public class FahClientMessageBuffer
                 break;
             case FahClientMessageType.LogRestart:
             case FahClientMessageType.LogUpdate:
-                // TODO: Handle LogRestart and LogUpdate messages
+                await UpdateFahClientLog(message);
                 break;
             // ReSharper disable once RedundantEmptySwitchSection
             default:
@@ -83,4 +85,50 @@ public class FahClientMessageBuffer
         var slot = messages.SlotCollection.First(x => x.ID == machineId);
         slot.SlotOptions = slotOptions;
     }
+
+    private readonly FahClientLog _log = new();
+
+    private async Task UpdateFahClientLog(FahClientMessage message)
+    {
+        var logUpdate = LogUpdate.Load(message.MessageText);
+
+        var logIsRetrieved = _log.ClientRuns.Count > 0;
+        if (logIsRetrieved)
+        {
+            await UpdateFahClientLogFromStringBuilder(logUpdate.Value);
+        }
+        else
+        {
+            AppendToLogBuffer(logUpdate.Value);
+            if (message.MessageText.Length < UInt16.MaxValue)
+            {
+                await UpdateFahClientLogFromStringBuilder(_logBuffer!);
+                ReleaseLogBuffer();
+            }
+        }
+    }
+
+    private async Task UpdateFahClientLogFromStringBuilder(StringBuilder value)
+    {
+        using var textReader = new Internal.StringBuilderReader(value);
+        using var reader = new FahClientLogTextReader(textReader);
+        await _log.ReadAsync(reader).ConfigureAwait(false);
+
+        if (_messages.ClientRun is null)
+        {
+            _messages = _messages with { ClientRun = _log.ClientRuns.LastOrDefault() };
+        }
+    }
+
+    private StringBuilder? _logBuffer = new();
+
+    private void AppendToLogBuffer(StringBuilder source)
+    {
+        foreach (var chunk in source.GetChunks())
+        {
+            _logBuffer!.Append(chunk);
+        }
+    }
+
+    private void ReleaseLogBuffer() => _logBuffer = null;
 }

@@ -1,5 +1,6 @@
 ﻿using HFM.Client;
 using HFM.Client.ObjectModel;
+using HFM.Log;
 
 namespace HFM.Core.Client;
 
@@ -15,6 +16,8 @@ public record FahClientMessages
     public SlotCollection? SlotCollection { get; init; }
 
     public UnitCollection? UnitCollection { get; init; }
+
+    public ClientRun? ClientRun { get; init; }
 
     public IReadOnlyCollection<FahClientMessage>? ProcessedMessages { get; init; }
 }

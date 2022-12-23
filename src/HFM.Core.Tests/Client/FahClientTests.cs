@@ -43,6 +43,7 @@ public class FahClientTests
                 Assert.That(messages.Options, Is.Not.Null);
                 Assert.That(messages.SlotCollection, Has.Count.EqualTo(2));
                 Assert.That(messages.UnitCollection, Has.Count.EqualTo(1));
+                Assert.That(messages.ClientRun, Is.Not.Null);
             });
         }
     }
