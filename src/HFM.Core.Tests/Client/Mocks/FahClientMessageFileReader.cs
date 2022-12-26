@@ -14,11 +14,10 @@ internal static class FahClientMessageFileReader
         {
             if (Path.GetFileName(file) == "log.txt")
             {
-                //using (var textReader = new StreamReader(file))
-                //using (var reader = new FahClientLogTextReader(textReader))
-                //{
-                //    await Messages.Log.ReadAsync(reader);
-                //}
+                using var textReader = new StreamReader(file);
+                var identifier = new FahClientMessageIdentifier(FahClientMessageType.LogRestart, DateTime.UtcNow);
+                var messageText = new StringBuilder(textReader.ReadToEnd());
+                yield return new FahClientMessage(identifier, messageText);
             }
             else
             {
@@ -31,7 +30,16 @@ internal static class FahClientMessageFileReader
         Directory.EnumerateFiles(path).OrderBy(x =>
         {
             var fileName = Path.GetFileNameWithoutExtension(x);
-            return fileName[fileName.LastIndexOf("-", StringComparison.Ordinal)..];
+            var lastDashIndex = fileName.LastIndexOf("-", StringComparison.Ordinal);
+            if (lastDashIndex != -1)
+            {
+                string dateTimeSubstring = fileName[lastDashIndex..];
+                if (DateTime.TryParse(dateTimeSubstring, out DateTime _))
+                {
+                    return dateTimeSubstring;
+                }
+            }
+            return fileName;
         });
 
     internal static FahClientMessage ReadMessage(string path)
