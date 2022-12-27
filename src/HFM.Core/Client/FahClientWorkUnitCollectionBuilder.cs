@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
+﻿using System.Globalization;
 
 using HFM.Client.ObjectModel;
 using HFM.Core.Client.Internal;
@@ -68,7 +67,7 @@ public class FahClientWorkUnitCollectionBuilder
 
     private static bool PreviousWorkUnitShouldBeCompleted(
         WorkUnitCollection workUnits,
-        [NotNullWhen(true)] WorkUnit? previousWorkUnit)
+        [System.Diagnostics.CodeAnalysis.NotNullWhen(true)] WorkUnit? previousWorkUnit)
     {
         return previousWorkUnit is not null &&
                !ContainsPreviousWorkUnitId() &&
@@ -156,14 +155,7 @@ public class FahClientWorkUnitCollectionBuilder
 
     private WorkUnitPlatform? BuildWorkUnitPlatform(FahClientSlotDescription slotDescription, UnitRun? unitRun)
     {
-        string? implementation = slotDescription.SlotType switch
-        {
-            FahClientSlotType.Unknown => null,
-            FahClientSlotType.Cpu => WorkUnitPlatformImplementation.CPU,
-            FahClientSlotType.Gpu => unitRun?.Data.Platform,
-            _ => null,
-        };
-
+        string? implementation = ToPlatformImplementation(slotDescription.SlotType, unitRun);
         if (String.IsNullOrEmpty(implementation))
         {
             return null;
@@ -209,6 +201,16 @@ public class FahClientWorkUnitCollectionBuilder
 
         return new WorkUnitPlatform(implementation);
     }
+
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    private static string? ToPlatformImplementation(FahClientSlotType slotType, UnitRun? unitRun) =>
+        slotType switch
+        {
+            FahClientSlotType.Unknown => null,
+            FahClientSlotType.Cpu => WorkUnitPlatformImplementation.CPU,
+            FahClientSlotType.Gpu => unitRun?.Data.Platform,
+            _ => null,
+        };
 
     private static Version? ParseCoreVersion(string? value) =>
         value is null

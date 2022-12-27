@@ -48,6 +48,44 @@ public class FahClientTests
         }
 
         [Test]
+        public async Task RefreshSendsSlotOptionsCommandAfterReceivingSlotInfo()
+        {
+            await _client!.Refresh();
+
+            var mockClient = GetMockFahClient(_client!);
+            await mockClient.ReadMessagesTask!;
+
+            var messages = mockClient.LastMessages!;
+            Assert.Multiple(() =>
+            {
+                Assert.That(messages.SlotCollection, Has.Count.EqualTo(2));
+                var slotOptionsCommands = mockClient.Connection!.Commands
+                    .Where(x => x.CommandText!.StartsWith("slot-options", StringComparison.Ordinal))
+                    .ToList();
+                Assert.That(slotOptionsCommands, Has.Count.EqualTo(2));
+            });
+        }
+
+        [Test]
+        public async Task RefreshSendsQueueInfoCommandAfterReceivingLogUpdates()
+        {
+            await _client!.Refresh();
+
+            var mockClient = GetMockFahClient(_client!);
+            await mockClient.ReadMessagesTask!;
+
+            var messages = mockClient.LastMessages!;
+            Assert.Multiple(() =>
+            {
+                Assert.That(messages.ClientRun, Is.Not.Null);
+                var queueInfoCommands = mockClient.Connection!.Commands
+                    .Where(x => x.CommandText == "queue-info")
+                    .ToList();
+                Assert.That(queueInfoCommands, Has.Count.EqualTo(4));
+            });
+        }
+
+        [Test]
         public async Task MessagesAreClearedOnClose()
         {
             await _client!.Refresh();

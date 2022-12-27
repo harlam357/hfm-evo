@@ -20,4 +20,11 @@ public record FahClientMessages
     public ClientRun? ClientRun { get; init; }
 
     public IReadOnlyCollection<FahClientMessage>? ProcessedMessages { get; init; }
+
+    public bool WasProcessed(string messageType) =>
+        ProcessedMessages is not null && ProcessedMessages.Any(x => x.Identifier.MessageType == messageType);
+
+    public bool LogMessageWasProcessed() =>
+        ProcessedMessages is not null &&
+        ProcessedMessages.Any(x => x.Identifier.MessageType is FahClientMessageType.LogRestart or FahClientMessageType.LogUpdate);
 }

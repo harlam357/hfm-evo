@@ -1,4 +1,6 @@
-﻿using HFM.Client;
+﻿using System.Diagnostics;
+
+using HFM.Client;
 
 namespace HFM.Core.Client.Mocks;
 
@@ -74,6 +76,7 @@ public class MockFahClientConnection : FahClientConnection
     }
 }
 
+[DebuggerDisplay("{CommandText}")]
 public class MockFahClientCommand : FahClientCommand
 {
     public MockFahClientCommand(FahClientConnection connection) : base(connection)
