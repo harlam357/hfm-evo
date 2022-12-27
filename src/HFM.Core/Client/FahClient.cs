@@ -1,7 +1,11 @@
 ﻿using System.Globalization;
 
 using HFM.Client;
+using HFM.Client.ObjectModel;
+using HFM.Core.Internal;
 using HFM.Core.Logging;
+using HFM.Core.WorkUnits;
+using HFM.Log;
 
 namespace HFM.Core.Client;
 
@@ -48,28 +52,30 @@ public class FahClient : Client
     protected override async Task OnRefresh()
     {
         Messages = await MessageBuffer.Empty().ConfigureAwait(false);
-        if (IsHeartbeatOverdue(Messages.Heartbeat))
+
+        var messages = Messages;
+        if (IsHeartbeatOverdue(messages.Heartbeat))
         {
             Close();
         }
 
-        if (Messages.WasProcessed(FahClientMessageType.SlotInfo))
+        if (messages.WasProcessed(FahClientMessageType.SlotInfo))
         {
-            foreach (var slot in Messages.SlotCollection!)
+            foreach (var slot in messages.SlotCollection!)
             {
                 await ExecuteSlotOptionsCommand(slot.ID).ConfigureAwait(false);
             }
         }
 
-        if (Messages.ClientRun is not null)
+        if (messages.ClientRun is not null)
         {
-            if (Messages.LogMessageWasProcessed())
+            if (messages.LogMessageWasProcessed())
             {
                 await ExecuteQueueInfoCommand().ConfigureAwait(false);
             }
             else
             {
-                await OnProcessMessages().ConfigureAwait(false);
+                await OnProcessMessages(messages).ConfigureAwait(false);
             }
         }
     }
@@ -87,35 +93,77 @@ public class FahClient : Client
         return minutesSinceLastHeartbeat > maximumMinutesBetweenHeartbeats;
     }
 
-    private Task OnProcessMessages()
+    private Task OnProcessMessages(FahClientMessages messages)
     {
-        var messages = Messages;
-        if (messages?.SlotCollection == null)
+        if (messages.SlotCollection == null)
         {
             return Task.CompletedTask;
         }
 
+        var resources = new List<FahClientResource>();
+
         var workUnitCollectionBuilder = new FahClientWorkUnitCollectionBuilder(messages);
         foreach (var slot in messages.SlotCollection.Where(x => x.ID.HasValue))
         {
-            var slotDescription = FahClientSlotDescription.Parse(slot.Description);
+            var slotDescription = ParseSlotDescription(slot.Description, messages.Info);
             if (slotDescription is null)
             {
                 continue;
             }
 
-            var workUnits = workUnitCollectionBuilder.BuildForSlot(slot.ID!.Value, slotDescription, null);
+            int slotId = slot.ID!.Value;
+            var workUnits = workUnitCollectionBuilder.BuildForSlot(slotId, slotDescription, null);
 
-            if (_logger.IsEnabled(LoggerLevel.Debug))
+            resources.Add(new FahClientResource
             {
-                foreach (var unit in workUnits)
-                {
-                    _logger.Debug(unit.ToString());
-                }
+                SlotId = slotId,
+                SlotDescription = slotDescription,
+                WorkUnit = workUnits.Current,
+                LogLines = EnumerateLogLines(messages.ClientRun, slotId, workUnits.Current)
+            });
+        }
+
+        SetResources(resources);
+
+        return Task.CompletedTask;
+    }
+
+    private static FahClientSlotDescription? ParseSlotDescription(string? description, Info? info)
+    {
+        var slotDescription = FahClientSlotDescription.Parse(description);
+        if (slotDescription is null)
+        {
+            return null;
+        }
+
+        if (slotDescription.SlotType == FahClientSlotType.Cpu)
+        {
+            slotDescription.Processor = info?.System?.CPU;
+        }
+        return slotDescription;
+    }
+
+    private static IReadOnlyCollection<LogLine> EnumerateLogLines(ClientRun? clientRun, int slotId, WorkUnit? workUnit)
+    {
+        IEnumerable<LogLine>? logLines = workUnit?.LogLines;
+
+        if (logLines is null)
+        {
+            var slotRun = clientRun?.GetSlotRun(slotId);
+            if (slotRun is not null)
+            {
+                logLines = LogLineEnumerable.Create(slotRun);
             }
         }
 
-        return Task.CompletedTask;
+        if (logLines is null && clientRun is not null)
+        {
+            logLines = LogLineEnumerable.Create(clientRun);
+        }
+
+        return logLines is null
+            ? Array.Empty<LogLine>()
+            : logLines.ToList();
     }
 
     protected Task? ReadMessagesTask { get; private set; }

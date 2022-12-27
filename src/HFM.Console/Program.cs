@@ -27,18 +27,18 @@ using var services = new ServiceContainer();
 services.RegisterAssembly(Assembly.GetExecutingAssembly());
 var provider = services.CreateServiceProvider(EmptyServiceCollection.Instance);
 
-ConfigureLogging();
+var logger = ConfigureLogging();
 using var clientScheduledTasks = LoadClients(args[0]);
 
 exitEvent.WaitOne();
 
-void ConfigureLogging()
+ILogger ConfigureLogging()
 {
-    var logger = (Logger)provider.GetRequiredService<ILogger>();
+    var l = (Logger)provider.GetRequiredService<ILogger>();
 #if DEBUG
-    logger.Level = LoggerLevel.Debug;
+    l.Level = LoggerLevel.Debug;
 #else
-    logger.Level = provider.GetRequiredService<IPreferences>().Get<LoggerLevel>(Preference.MessageLevel);
+    l.Level = provider.GetRequiredService<IPreferences>().Get<LoggerLevel>(Preference.MessageLevel);
 #endif
 
     var loggerEvents = provider.GetRequiredService<ILoggerEvents>();
@@ -49,6 +49,8 @@ void ConfigureLogging()
             Console.WriteLine(message);
         }
     };
+
+    return l;
 }
 
 ClientScheduledTasks LoadClients(string path)
@@ -57,6 +59,13 @@ ClientScheduledTasks LoadClients(string path)
 
     var settings = new ClientSettingsFileSerializer().Deserialize(path);
     var configuration = provider.GetRequiredService<ClientConfiguration>();
+    configuration.ClientConfigurationChanged += (_, _) =>
+    {
+        foreach (var resource in configuration.SelectMany(x => x.Resources))
+        {
+            logger.Info(resource.ToString());
+        }
+    };
     configuration.Load(settings!);
 
     return tasks;

@@ -21,11 +21,13 @@ public class MockFahClient : FahClient
     }
 
     public FahClientMessages? LastMessages { get; private set; }
+    public IReadOnlyCollection<ClientResource>? LastResources { get; private set; }
 
     protected override async Task OnRefresh()
     {
         await base.OnRefresh();
         LastMessages = Messages;
+        LastResources = Resources;
     }
 
     public new Task? ReadMessagesTask => base.ReadMessagesTask;

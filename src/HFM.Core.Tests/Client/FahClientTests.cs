@@ -16,25 +16,24 @@ public class FahClientTests
     [TestFixture]
     public class GivenClientMessages : FahClientTests
     {
+        private MockFahClient? _mockClient;
+
         [SetUp]
-        public virtual void BeforeEach()
+        public virtual async Task BeforeEach()
         {
-            var mockClient = new MockFahClient(new ClientSettings())
+            _mockClient = new MockFahClient(new ClientSettings())
                 .HasMessages(
                     FahClientMessageFileReader.ReadAllMessages(
                         Path.Combine(TestFiles.SolutionPath, "Client_v7_19")).ToArray());
-            _client = mockClient;
+            _client = _mockClient;
+            await _client!.Refresh();
+            await _mockClient.ReadMessagesTask!;
         }
 
         [Test]
-        public async Task RefreshReadsAllMessages()
+        public void RefreshReadsAllMessages()
         {
-            await _client!.Refresh();
-
-            var mockClient = GetMockFahClient(_client!);
-            await mockClient.ReadMessagesTask!;
-
-            var messages = mockClient.LastMessages!;
+            var messages = _mockClient!.LastMessages!;
             Assert.Multiple(() =>
             {
                 Assert.That(messages.ProcessedMessages, Has.Count.GreaterThanOrEqualTo(1));
@@ -48,18 +47,39 @@ public class FahClientTests
         }
 
         [Test]
-        public async Task RefreshSendsSlotOptionsCommandAfterReceivingSlotInfo()
+        public void RefreshCreatesClientResources()
         {
-            await _client!.Refresh();
+            var resources = _mockClient!.LastResources!.Cast<FahClientResource>().ToList();
+            Assert.Multiple(() =>
+            {
+                Assert.That(resources, Has.Count.EqualTo(2));
+                Assert.That(resources.All(x => x.SlotId >= 0));
+                Assert.That(resources.All(x => x.SlotDescription is not null));
+                Assert.That(resources.All(x => x.LogLines.Count > 0));
+            });
+        }
 
-            var mockClient = GetMockFahClient(_client!);
-            await mockClient.ReadMessagesTask!;
+        [Test]
+        public void RefreshSetsCpuSlotDescriptionProcessorToSystemCpu()
+        {
+            var resources = _mockClient!.LastResources!.Cast<FahClientResource>().ToList();
+            Assert.Multiple(() =>
+            {
+                var cpuResource = resources.First();
+                Assert.That(cpuResource.SlotDescription, Is.TypeOf<FahClientCpuSlotDescription>());
+                var cpuSlotDescription = (FahClientCpuSlotDescription)cpuResource.SlotDescription!;
+                Assert.That(cpuSlotDescription.Processor, Is.EqualTo("AMD Ryzen 7 3700X 8-Core Processor"));
+            });
+        }
 
-            var messages = mockClient.LastMessages!;
+        [Test]
+        public void RefreshSendsSlotOptionsCommandAfterReceivingSlotInfo()
+        {
+            var messages = _mockClient!.LastMessages!;
             Assert.Multiple(() =>
             {
                 Assert.That(messages.SlotCollection, Has.Count.EqualTo(2));
-                var slotOptionsCommands = mockClient.Connection!.Commands
+                var slotOptionsCommands = _mockClient.Connection!.Commands
                     .Where(x => x.CommandText!.StartsWith("slot-options", StringComparison.Ordinal))
                     .ToList();
                 Assert.That(slotOptionsCommands, Has.Count.EqualTo(2));
@@ -67,18 +87,13 @@ public class FahClientTests
         }
 
         [Test]
-        public async Task RefreshSendsQueueInfoCommandAfterReceivingLogUpdates()
+        public void RefreshSendsQueueInfoCommandAfterReceivingLogUpdates()
         {
-            await _client!.Refresh();
-
-            var mockClient = GetMockFahClient(_client!);
-            await mockClient.ReadMessagesTask!;
-
-            var messages = mockClient.LastMessages!;
+            var messages = _mockClient!.LastMessages!;
             Assert.Multiple(() =>
             {
                 Assert.That(messages.ClientRun, Is.Not.Null);
-                var queueInfoCommands = mockClient.Connection!.Commands
+                var queueInfoCommands = _mockClient.Connection!.Commands
                     .Where(x => x.CommandText == "queue-info")
                     .ToList();
                 Assert.That(queueInfoCommands, Has.Count.EqualTo(4));
@@ -86,13 +101,8 @@ public class FahClientTests
         }
 
         [Test]
-        public async Task MessagesAreClearedOnClose()
+        public void MessagesAreClearedOnClose()
         {
-            await _client!.Refresh();
-
-            var mockClient = GetMockFahClient(_client!);
-            await mockClient.ReadMessagesTask!;
-
             _client!.Close();
             Assert.That(_client!.Messages, Is.Null);
         }
@@ -122,17 +132,6 @@ public class FahClientTests
         }
 
         [Test]
-        public async Task RefreshReadsMessages()
-        {
-            await _client!.Refresh();
-
-            var mockClient = GetMockFahClient(_client!);
-            await mockClient.ReadMessagesTask!;
-
-            Assert.That(mockClient.LastMessages!.ProcessedMessages, Has.Count.GreaterThanOrEqualTo(1));
-        }
-
-        [Test]
         public async Task ThenThePreviousReaderTaskIsDisposed()
         {
             var mockClient = GetMockFahClient(_client!);
@@ -147,36 +146,33 @@ public class FahClientTests
     [TestFixture]
     public class GivenHeartbeatIsOverdue : FahClientTests
     {
+        private MockFahClient? _mockClient;
+
         [SetUp]
-        public virtual void BeforeEach()
+        public virtual async Task BeforeEach()
         {
             var maximumMinutesBetweenHeartbeats = TimeSpan.FromMinutes(3);
 
-            var mockClient = new MockFahClient(new ClientSettings())
+            _mockClient = new MockFahClient(new ClientSettings())
                 .HasMessages(
                     new FahClientMessage(
                         new FahClientMessageIdentifier(FahClientMessageType.Heartbeat, DateTime.UtcNow.Subtract(maximumMinutesBetweenHeartbeats)),
                         new StringBuilder()),
                     FahClientMessageFileReader.ReadMessage(
                         Path.Combine(TestFiles.SolutionPath, "Client_v7_19", "info-20210905T085332.txt")));
-            _client = mockClient;
+            _client = _mockClient;
+            await _client!.Refresh();
+            await _mockClient.ReadMessagesTask!;
         }
 
         [Test]
-        public async Task RefreshClosesTheClientConnection()
-        {
-            await _client!.Refresh();
-
-            var mockClient = GetMockFahClient(_client!);
-            await mockClient.ReadMessagesTask!;
-
+        public void RefreshClosesTheClientConnection() =>
             Assert.Multiple(() =>
             {
-                Assert.That(_client.Connected, Is.False);
+                Assert.That(_client!.Connected, Is.False);
                 // Close() called by OnRefresh() and completion of ReadMessagesTask
-                Assert.That(mockClient.CloseCount, Is.EqualTo(2));
+                Assert.That(_mockClient!.CloseCount, Is.EqualTo(2));
             });
-        }
     }
 
     [TestFixture]
@@ -197,17 +193,19 @@ public class FahClientTests
     [TestFixture]
     public class GivenClientSettingsHasPassword : FahClientTests
     {
+        private MockFahClientConnection? _connection;
+
         [SetUp]
-        public virtual void BeforeEach() =>
+        public virtual async Task BeforeEach()
+        {
             _client = new MockFahClient(new ClientSettings { Password = "foo" });
+            await _client.Refresh();
+            _connection = GetMockFahClientConnection(_client);
+        }
 
         [Test]
-        public async Task RefreshExecutesAuthorizationCommand()
-        {
-            await _client!.Refresh();
-            var connection = GetMockFahClientConnection(_client);
-            Assert.That(connection.Commands.First().CommandText, Is.EqualTo("auth foo"));
-        }
+        public void RefreshExecutesAuthorizationCommand() =>
+            Assert.That(_connection!.Commands.First().CommandText, Is.EqualTo("auth foo"));
     }
 
     [TestFixture]
@@ -216,22 +214,19 @@ public class FahClientTests
         private ILogger? _logger;
 
         [SetUp]
-        public virtual void BeforeEach()
+        public virtual async Task BeforeEach()
         {
             _logger = Mock.Of<ILogger>();
             var mockClient = new MockFahClient(new ClientSettings(), _logger)
                 .MessageReaderThrowsOnRead(new ObjectDisposedException(""));
             _client = mockClient;
+            await _client!.Refresh();
+            await mockClient.ReadMessagesTask!;
         }
 
         [Test]
-        public async Task ThenDebugExceptionIsLogged()
+        public void ThenDebugExceptionIsLogged()
         {
-            await _client!.Refresh();
-
-            var mockClient = GetMockFahClient(_client!);
-            await mockClient.ReadMessagesTask!;
-
             var mockLogger = Mock.Get(_logger);
             mockLogger.Verify(x => x!.Log(LoggerLevel.Debug, It.IsAny<string>(), It.IsNotNull<Exception>()));
         }
@@ -243,22 +238,19 @@ public class FahClientTests
         private ILogger? _logger;
 
         [SetUp]
-        public virtual void BeforeEach()
+        public virtual async Task BeforeEach()
         {
             _logger = Mock.Of<ILogger>();
             var mockClient = new MockFahClient(new ClientSettings(), _logger)
                 .MessageReaderThrowsOnRead(new InvalidOperationException(""));
             _client = mockClient;
+            await _client!.Refresh();
+            await mockClient.ReadMessagesTask!;
         }
 
         [Test]
-        public async Task ThenErrorExceptionIsLogged()
+        public void ThenErrorExceptionIsLogged()
         {
-            await _client!.Refresh();
-
-            var mockClient = GetMockFahClient(_client!);
-            await mockClient.ReadMessagesTask!;
-
             var mockLogger = Mock.Get(_logger);
             mockLogger.Verify(x => x!.Log(LoggerLevel.Error, It.IsAny<string>(), It.IsNotNull<Exception>()));
         }
@@ -270,20 +262,19 @@ public class FahClientTests
         private ILogger? _logger;
 
         [SetUp]
-        public virtual void BeforeEach()
+        public virtual async Task BeforeEach()
         {
             _logger = Mock.Of<ILogger>();
             var mockClient = new MockFahClient(new ClientSettings(), _logger)
                 .ConnectionThrowsOnClose(new InvalidOperationException(""));
             _client = mockClient;
+            await _client!.Refresh();
+            _client.Close();
         }
 
         [Test]
-        public async Task ThenErrorExceptionIsLogged()
+        public void ThenErrorExceptionIsLogged()
         {
-            await _client!.Refresh();
-            _client.Close();
-
             var mockLogger = Mock.Get(_logger);
             mockLogger.Verify(x => x!.Log(LoggerLevel.Error, It.IsAny<string>(), It.IsNotNull<Exception>()));
         }

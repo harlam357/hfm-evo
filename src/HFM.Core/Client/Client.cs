@@ -11,6 +11,11 @@ public interface IClient
     void Close();
 
     Task Refresh(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets the collection of client resources.
+    /// </summary>
+    IReadOnlyCollection<ClientResource> Resources { get; }
 }
 
 internal interface ISetClientSettings
@@ -60,8 +65,6 @@ public abstract class Client : IClient, ISetClientSettings
         }
         finally
         {
-            OnClientChanged(new ClientChangedEventArgs(ClientChangedAction.Invalidate));
-
             Interlocked.Exchange(ref _refreshLock, 0);
         }
     }
@@ -79,6 +82,18 @@ public abstract class Client : IClient, ISetClientSettings
 
     // ISetClientSettings
     public void SetClientSettings(ClientSettings settings) => Settings = settings;
+
+    private List<ClientResource>? _resources;
+
+    public IReadOnlyCollection<ClientResource> Resources =>
+        _resources is null ? Array.Empty<ClientResource>() : _resources;
+
+    protected void SetResources(IEnumerable<ClientResource>? resources)
+    {
+        var newResources = resources is null ? null : new List<ClientResource>(resources);
+        Interlocked.Exchange(ref _resources, newResources);
+        OnClientChanged(new ClientChangedEventArgs(ClientChangedAction.Invalidate));
+    }
 }
 
 public enum ClientChangedAction
