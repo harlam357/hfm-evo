@@ -1,5 +1,6 @@
 ﻿using HFM.Client;
 using HFM.Core.Logging;
+using HFM.Core.WorkUnits;
 
 namespace HFM.Core.Client.Mocks;
 
@@ -7,7 +8,7 @@ public class MockFahClient : FahClient
 {
     public new MockFahClientConnection? Connection => (MockFahClientConnection?)base.Connection;
 
-    public MockFahClient(ClientSettings settings, ILogger? logger = null) : base(logger)
+    public MockFahClient(ClientSettings settings, ILogger? logger = null) : base(logger, NullProteinService.Instance)
     {
         Settings = settings;
     }

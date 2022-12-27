@@ -1,4 +1,5 @@
 ﻿using HFM.Core.Logging;
+using HFM.Core.WorkUnits;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -14,6 +15,7 @@ public class ClientFactoryTests
     {
         var services = new ServiceCollection();
         services.AddSingleton<ILogger>(NullLogger.Instance);
+        services.AddSingleton<IProteinService>(NullProteinService.Instance);
         services.AddTransient<FahClient>();
         var serviceProvider = services.BuildServiceProvider();
 

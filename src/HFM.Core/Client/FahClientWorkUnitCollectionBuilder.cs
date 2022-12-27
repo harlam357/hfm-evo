@@ -5,28 +5,33 @@ using HFM.Core.Client.Internal;
 using HFM.Core.Internal;
 using HFM.Core.WorkUnits;
 using HFM.Log;
+using HFM.Proteins;
 
 namespace HFM.Core.Client;
 
 public class FahClientWorkUnitCollectionBuilder
 {
     private readonly FahClientMessages _messages;
+    private readonly IProteinService _proteinService;
 
-    public FahClientWorkUnitCollectionBuilder(FahClientMessages messages)
+    public FahClientWorkUnitCollectionBuilder(FahClientMessages messages, IProteinService proteinService)
     {
         _messages = messages;
+        _proteinService = proteinService;
     }
 
-    public WorkUnitCollection BuildForSlot(int slotId, FahClientSlotDescription slotDescription, WorkUnit? previousWorkUnit)
+    public async Task<WorkUnitCollection> BuildForSlot(int slotId, FahClientSlotDescription slotDescription, WorkUnit? previousWorkUnit)
     {
+        var workUnits = new WorkUnitCollection();
         if (_messages.UnitCollection is null)
         {
-            return new WorkUnitCollection();
+            return workUnits;
         }
 
-        var workUnits = new WorkUnitCollection(_messages.UnitCollection!
-            .Where(x => x.Slot == slotId)
-            .Select(x => BuildWorkUnit(slotId, slotDescription, x)));
+        foreach (var unit in _messages.UnitCollection.Where(x => x.Slot == slotId))
+        {
+            workUnits.Add(await BuildWorkUnit(slotId, slotDescription, unit).ConfigureAwait(false));
+        }
 
         var currentId = GetCurrentWorkUnitId(slotId);
         if (currentId.HasValue)
@@ -93,41 +98,37 @@ public class FahClientWorkUnitCollectionBuilder
         }
     }
 
-    private WorkUnit BuildWorkUnit(int slotId, FahClientSlotDescription slotDescription, Unit unit)
+    private async Task<WorkUnit> BuildWorkUnit(int slotId, FahClientSlotDescription slotDescription, Unit unit)
     {
         var projectInfo = unit.ToProjectInfo();
         var unitRun = _messages.ClientRun.GetUnitRun(slotId, unit.ID.GetValueOrDefault(), projectInfo);
 
         var workUnitResult = WorkUnitResult.Parse(unitRun?.Data.WorkUnitResult);
+        var protein = await _proteinService.GetOrRefresh(unit.Project.GetValueOrDefault()).ConfigureAwait(false) ?? new Protein();
 
         return new WorkUnit
         {
-            UnitRetrievalTime = GetUnitRetrievalTime(),
-
             Id = unit.ID.GetValueOrDefault(),
+            UnitRetrievalTime = GetUnitRetrievalTime(),
+            DonorName = _messages.Options?[Options.User] ?? Unknown.Value,
+            DonorTeam = ToNullableInt32(_messages.Options?[Options.Team]).GetValueOrDefault(),
             Assigned = unit.AssignedDateTime.GetValueOrDefault(),
             Timeout = unit.TimeoutDateTime.GetValueOrDefault(),
-
+            UnitStartTimeStamp = unitRun?.Data.UnitStartTimeStamp ?? TimeSpan.Zero,
+            Finished = workUnitResult.IsTerminating ? DateTime.UtcNow : null,
+            Core = unit.Core,
+            CoreVersion = ParseCoreVersion(unitRun?.Data.CoreVersion),
             ProjectId = unit.Project.GetValueOrDefault(),
             ProjectRun = unit.Run.GetValueOrDefault(),
             ProjectClone = unit.Clone.GetValueOrDefault(),
             ProjectGen = unit.Gen.GetValueOrDefault(),
-
-            DonorName = _messages.Options?[Options.User] ?? Unknown.Value,
-            DonorTeam = ToNullableInt32(_messages.Options?[Options.Team]).GetValueOrDefault(),
-
-            Core = unit.Core,
             UnitHex = unit.UnitHex,
-
+            Protein = protein,
+            Platform = BuildWorkUnitPlatform(slotDescription, unitRun),
+            Result = workUnitResult,
             LogLines = unitRun is null ? null : LogLineEnumerable.Create(unitRun).ToList(),
             Frames = (IReadOnlyDictionary<int, LogLineFrameData>?)unitRun?.Data.Frames,
-            UnitStartTimeStamp = unitRun?.Data.UnitStartTimeStamp ?? TimeSpan.Zero,
-            FramesObserved = unitRun?.Data.FramesObserved ?? default,
-            CoreVersion = ParseCoreVersion(unitRun?.Data.CoreVersion),
-            Result = workUnitResult,
-            Finished = workUnitResult.IsTerminating ? DateTime.UtcNow : null,
-
-            Platform = BuildWorkUnitPlatform(slotDescription, unitRun)
+            FramesObserved = unitRun?.Data.FramesObserved ?? default
         };
     }
 

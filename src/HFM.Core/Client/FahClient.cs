@@ -11,16 +11,18 @@ namespace HFM.Core.Client;
 
 public class FahClient : Client
 {
+    private readonly ILogger _logger;
+    private readonly IProteinService _proteinService;
+
+    public FahClient(ILogger? logger, IProteinService proteinService)
+    {
+        _logger = logger ?? NullLogger.Instance;
+        _proteinService = proteinService;
+    }
+
     protected FahClientConnection? Connection { get; set; }
 
     public override bool Connected => Connection is { Connected: true };
-
-    private readonly ILogger _logger;
-
-    public FahClient(ILogger? logger)
-    {
-        _logger = logger ?? NullLogger.Instance;
-    }
 
     protected override void OnClose()
     {
@@ -93,16 +95,16 @@ public class FahClient : Client
         return minutesSinceLastHeartbeat > maximumMinutesBetweenHeartbeats;
     }
 
-    private Task OnProcessMessages(FahClientMessages messages)
+    private async Task OnProcessMessages(FahClientMessages messages)
     {
         if (messages.SlotCollection == null)
         {
-            return Task.CompletedTask;
+            return;
         }
 
         var resources = new List<FahClientResource>();
 
-        var workUnitCollectionBuilder = new FahClientWorkUnitCollectionBuilder(messages);
+        var workUnitCollectionBuilder = new FahClientWorkUnitCollectionBuilder(messages, _proteinService);
         foreach (var slot in messages.SlotCollection.Where(x => x.ID.HasValue))
         {
             var slotDescription = ParseSlotDescription(slot.Description, messages.Info);
@@ -111,22 +113,25 @@ public class FahClient : Client
                 continue;
             }
 
+            // TODO: provide previousWorkUnit
             int slotId = slot.ID!.Value;
-            var workUnits = workUnitCollectionBuilder.BuildForSlot(slotId, slotDescription, null);
+            var workUnits = await workUnitCollectionBuilder.BuildForSlot(slotId, slotDescription, null).ConfigureAwait(false);
+            var currentWorkUnit = workUnits.Current;
+            var status = (ClientResourceStatus)Enum.Parse(typeof(ClientResourceStatus), slot.Status, true);
 
             resources.Add(new FahClientResource
             {
-                Status = (ClientResourceStatus)Enum.Parse(typeof(ClientResourceStatus), slot.Status, true),
                 SlotId = slotId,
                 SlotDescription = slotDescription,
-                WorkUnit = workUnits.Current,
-                LogLines = EnumerateLogLines(messages.ClientRun, slotId, workUnits.Current)
+                Status = status,
+                Progress = currentWorkUnit?.Progress ?? 0,
+                WorkUnit = currentWorkUnit,
+                LogLines = EnumerateLogLines(messages.ClientRun, slotId, workUnits.Current),
+                Platform = messages.Info is null ? null : new ClientPlatform(messages.Info.Client.Version, messages.Info.System.OS)
             });
         }
 
         SetResources(resources);
-
-        return Task.CompletedTask;
     }
 
     private static FahClientSlotDescription? ParseSlotDescription(string? description, Info? info)

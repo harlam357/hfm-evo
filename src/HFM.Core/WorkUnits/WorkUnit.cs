@@ -1,10 +1,13 @@
 ﻿using HFM.Core.Collections;
 using HFM.Log;
+using HFM.Proteins;
 
 namespace HFM.Core.WorkUnits;
 
 public record WorkUnit : IProjectInfo, IItemIdentifier
 {
+    public int Id { get; init; } = ItemIdentifier.NoId;
+
     /// <summary>
     /// Gets the universal time this work unit record was generated.
     /// </summary>
@@ -34,6 +37,11 @@ public record WorkUnit : IProjectInfo, IItemIdentifier
     /// </summary>
     public DateTime? Finished { get; init; }
 
+    /// <summary>
+    /// Gets the core hex identifier.
+    /// </summary>
+    public string? Core { get; init; }
+
     public Version? CoreVersion { get; init; }
 
     public int ProjectId { get; init; }
@@ -44,9 +52,23 @@ public record WorkUnit : IProjectInfo, IItemIdentifier
 
     public int ProjectGen { get; init; }
 
+    /// <summary>
+    /// Gets the work unit hex identifier.
+    /// </summary>
+    public string? UnitHex { get; init; }
+
+    public Protein? Protein { get; init; }
+
     public WorkUnitPlatform? Platform { get; init; }
 
     public WorkUnitResult Result { get; init; }
+
+    public IReadOnlyCollection<LogLine>? LogLines { get; init; }
+
+    /// <summary>
+    /// Gets the dictionary of frame data parsed from log lines.
+    /// </summary>
+    public IReadOnlyDictionary<int, LogLineFrameData>? Frames { get; init; }
 
     /// <summary>
     /// Gets the number of frames observed (completed) since last unit start or resume from pause.
@@ -60,7 +82,7 @@ public record WorkUnit : IProjectInfo, IItemIdentifier
     {
         get
         {
-            if (Frames == null || Frames.Count == 0)
+            if (Frames is null || Frames.Count == 0)
             {
                 return null;
             }
@@ -70,28 +92,175 @@ public record WorkUnit : IProjectInfo, IItemIdentifier
         }
     }
 
-    public IReadOnlyCollection<LogLine>? LogLines { get; init; }
+    public int FramesComplete
+    {
+        get
+        {
+            var currentFrame = CurrentFrame;
+            if (currentFrame is null || currentFrame.ID < 0 || Protein is null)
+            {
+                return 0;
+            }
 
-    /// <summary>
-    /// Gets the dictionary of frame data parsed from log lines.
-    /// </summary>
-    public IReadOnlyDictionary<int, LogLineFrameData>? Frames { get; init; }
+            return currentFrame.ID <= Protein.Frames
+                ? currentFrame.ID
+                : Protein.Frames;
+        }
+    }
 
-    /// <summary>
-    /// Gets the core hex identifier.
-    /// </summary>
-    public string? Core { get; init; }
-
-    /// <summary>
-    /// Gets the work unit hex identifier.
-    /// </summary>
-    public string? UnitHex { get; init; }
-
-    public int Id { get; init; } = ItemIdentifier.NoId;
+    public int Progress => Protein is null ? 0 : FramesComplete * 100 / Protein.Frames;
 
     /// <summary>
     /// Gets the frame by frame ID or null if the ID does not exist.
     /// </summary>
     public LogLineFrameData? GetFrame(int frameId) =>
         Frames is not null && Frames.ContainsKey(frameId) ? Frames[frameId] : null;
+
+    /// <summary>
+    /// Gets the frame time for the given PPD calculation.
+    /// </summary>
+    public TimeSpan GetFrameTime(PpdCalculation ppdCalculation)
+    {
+        int rawTime = GetRawTime(ppdCalculation);
+        return TimeSpan.FromSeconds(rawTime);
+    }
+
+    /// <summary>
+    /// Get the credit for the given PPD and bonus calculations.
+    /// </summary>
+    public double GetCredit(PpdCalculation ppdCalculation, BonusCalculation calculateBonus)
+    {
+        if (!Protein.IsValid(Protein))
+        {
+            return 0.0;
+        }
+
+        var frameTime = GetFrameTime(ppdCalculation);
+#pragma warning disable IDE0072 // Add missing cases
+        return calculateBonus switch
+        {
+            BonusCalculation.DownloadTime => Protein.GetBonusCredit(GetUnitTimeByDownloadTime(frameTime)),
+            BonusCalculation.FrameTime => Protein.GetBonusCredit(GetUnitTimeByFrameTime(frameTime)),
+            _ => Protein!.Credit
+        };
+#pragma warning restore IDE0072 // Add missing cases
+    }
+
+    /// <summary>
+    /// Gets the units per day (UPD) for the given PPD calculation.
+    /// </summary>
+    public double GetUpd(PpdCalculation ppdCalculation) =>
+        Protein?.GetUPD(GetFrameTime(ppdCalculation)) ?? 0.0;
+
+    /// <summary>
+    /// Gets the points per day (PPD) for the given PPD and bonus calculations.
+    /// </summary>
+    public double GetPpd(PpdCalculation ppdCalculation, BonusCalculation calculateBonus)
+    {
+        if (!Protein.IsValid(Protein))
+        {
+            return 0.0;
+        }
+
+        var frameTime = GetFrameTime(ppdCalculation);
+#pragma warning disable IDE0072 // Add missing cases
+        return calculateBonus switch
+        {
+            BonusCalculation.DownloadTime => Protein.GetBonusPPD(frameTime, GetUnitTimeByDownloadTime(frameTime)),
+            BonusCalculation.FrameTime => Protein.GetBonusPPD(frameTime, GetUnitTimeByFrameTime(frameTime)),
+            _ => Protein.GetPPD(frameTime),
+        };
+#pragma warning restore IDE0072 // Add missing cases
+    }
+
+    /// <summary>
+    /// Gets the estimated time of arrival (ETA) for the given PPD calculation.
+    /// </summary>
+    public TimeSpan GetEta(PpdCalculation ppdCalculation) => GetEta(GetFrameTime(ppdCalculation));
+
+    /// <summary>
+    /// Gets the estimated time of arrival (ETA) for the given frame time.
+    /// </summary>
+    private TimeSpan GetEta(TimeSpan frameTime) =>
+        Protein is null
+            ? TimeSpan.Zero
+            : new TimeSpan((Protein.Frames - FramesComplete) * frameTime.Ticks);
+
+    public bool AllFramesCompleted => Protein?.Frames == FramesComplete;
+
+    private TimeSpan GetUnitTimeByDownloadTime(TimeSpan frameTime)
+    {
+        if (Assigned == default)
+        {
+            return TimeSpan.Zero;
+        }
+
+        if (Finished.HasValue)
+        {
+            return Finished.Value.Subtract(Assigned);
+        }
+
+        var eta = GetEta(frameTime);
+        return eta == TimeSpan.Zero && AllFramesCompleted == false
+            ? TimeSpan.Zero
+            : UnitRetrievalTime.Add(eta).Subtract(Assigned);
+    }
+
+    private TimeSpan GetUnitTimeByFrameTime(TimeSpan frameTime) =>
+        Protein is null
+            ? TimeSpan.Zero
+            : TimeSpan.FromSeconds(frameTime.TotalSeconds * Protein.Frames);
+
+    /// <summary>
+    /// Gets the raw frame time (in seconds) for the given PPD calculation.
+    /// </summary>
+    public int GetRawTime(PpdCalculation ppdCalculation) =>
+        ppdCalculation switch
+        {
+            PpdCalculation.LastFrame => FramesObserved > 1 ? Convert.ToInt32(CurrentFrame?.Duration.TotalSeconds ?? 0.0) : 0,
+            PpdCalculation.LastThreeFrames => FramesObserved > 3 ? GetDurationInSeconds(3) : 0,
+            PpdCalculation.AllFrames => FramesObserved > 0 ? GetDurationInSeconds(FramesObserved) : 0,
+            PpdCalculation.EffectiveRate => GetRawTimePerUnitDownload(),
+            _ => 0
+        };
+
+    private int GetDurationInSeconds(int numberOfFrames)
+    {
+        var currentFrame = CurrentFrame;
+        if (numberOfFrames < 1 || currentFrame is null)
+        {
+            return 0;
+        }
+
+        TimeSpan totalTime = TimeSpan.Zero;
+        int countFrames = 0;
+
+        int frameId = currentFrame.ID;
+        for (int i = 0; i < numberOfFrames; i++)
+        {
+            var frame = GetFrame(frameId);
+            if (frame is not null && frame.Duration > TimeSpan.Zero)
+            {
+                totalTime = totalTime.Add(frame.Duration);
+                countFrames++;
+            }
+            frameId--;
+        }
+
+        return countFrames > 0
+            ? Convert.ToInt32(totalTime.TotalSeconds) / countFrames
+            : 0;
+    }
+
+    private int GetRawTimePerUnitDownload()
+    {
+        var currentFrame = CurrentFrame;
+        if (currentFrame is null || currentFrame.ID <= 0 || Assigned == default)
+        {
+            return 0;
+        }
+
+        var timeSinceUnitAssignment = UnitRetrievalTime.Subtract(Assigned);
+        return Convert.ToInt32(timeSinceUnitAssignment.TotalSeconds) / currentFrame.ID;
+    }
 }

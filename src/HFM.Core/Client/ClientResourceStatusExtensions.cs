@@ -2,6 +2,7 @@
 
 namespace HFM.Core.Client;
 
+[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 public static class ClientResourceStatusExtensions
 {
     public static Color GetStatusColor(this ClientResourceStatus status) =>

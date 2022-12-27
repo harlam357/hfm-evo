@@ -14,10 +14,10 @@ public class FahClientWorkUnitCollectionBuilderTests
     public class GivenUnitCollectionIsNull : FahClientWorkUnitCollectionBuilderTests
     {
         [SetUp]
-        public void BeforeEach()
+        public async Task BeforeEach()
         {
-            _builder = new FahClientWorkUnitCollectionBuilder(new FahClientMessages());
-            _workUnits = _builder!.BuildForSlot(0, new FahClientCpuSlotDescription(), null);
+            _builder = new FahClientWorkUnitCollectionBuilder(new FahClientMessages(), NullProteinService.Instance);
+            _workUnits = await _builder!.BuildForSlot(0, new FahClientCpuSlotDescription(), null);
         }
 
         [Test]
@@ -41,8 +41,8 @@ public class FahClientWorkUnitCollectionBuilderTests
                 }
                 buffer.Add(message);
             }
-            _builder = new FahClientWorkUnitCollectionBuilder(await buffer.Empty());
-            _workUnits = _builder!.BuildForSlot(0, new FahClientCpuSlotDescription(), null);
+            _builder = new FahClientWorkUnitCollectionBuilder(await buffer.Empty(), NullProteinService.Instance);
+            _workUnits = await _builder!.BuildForSlot(0, new FahClientCpuSlotDescription(), null);
         }
 
         [Test]
@@ -69,8 +69,8 @@ public class FahClientWorkUnitCollectionBuilderTests
             {
                 buffer.Add(message);
             }
-            _builder = new FahClientWorkUnitCollectionBuilder(await buffer.Empty());
-            _workUnits = _builder!.BuildForSlot(0, new FahClientCpuSlotDescription(), null);
+            _builder = new FahClientWorkUnitCollectionBuilder(await buffer.Empty(), NullProteinService.Instance);
+            _workUnits = await _builder!.BuildForSlot(0, new FahClientCpuSlotDescription(), null);
         }
 
         [Test]
@@ -135,8 +135,8 @@ public class FahClientWorkUnitCollectionBuilderTests
                 }
                 buffer.Add(message);
             }
-            _builder = new FahClientWorkUnitCollectionBuilder(await buffer.Empty());
-            _workUnits = _builder!.BuildForSlot(0, new FahClientCpuSlotDescription(), null);
+            _builder = new FahClientWorkUnitCollectionBuilder(await buffer.Empty(), NullProteinService.Instance);
+            _workUnits = await _builder!.BuildForSlot(0, new FahClientCpuSlotDescription(), null);
         }
 
         [Test]
@@ -193,8 +193,8 @@ public class FahClientWorkUnitCollectionBuilderTests
             {
                 buffer.Add(message);
             }
-            _builder = new FahClientWorkUnitCollectionBuilder(await buffer.Empty());
-            _workUnits = _builder!.BuildForSlot(1, new FahClientCpuSlotDescription(), null);
+            _builder = new FahClientWorkUnitCollectionBuilder(await buffer.Empty(), NullProteinService.Instance);
+            _workUnits = await _builder!.BuildForSlot(1, new FahClientCpuSlotDescription(), null);
         }
 
         [Test]
@@ -255,9 +255,9 @@ public class FahClientWorkUnitCollectionBuilderTests
             {
                 buffer.Add(message);
             }
-            _builder = new FahClientWorkUnitCollectionBuilder(await buffer.Empty());
+            _builder = new FahClientWorkUnitCollectionBuilder(await buffer.Empty(), NullProteinService.Instance);
             var previousWorkUnit = new WorkUnit { Id = 0, ProjectId = 5767, ProjectRun = 3, ProjectClone = 138, ProjectGen = 144 };
-            _workUnits = _builder!.BuildForSlot(1, new FahClientCpuSlotDescription(), previousWorkUnit);
+            _workUnits = await _builder!.BuildForSlot(1, new FahClientCpuSlotDescription(), previousWorkUnit);
         }
 
         [Test]
@@ -310,8 +310,8 @@ public class FahClientWorkUnitCollectionBuilderTests
             {
                 buffer.Add(message);
             }
-            _builder = new FahClientWorkUnitCollectionBuilder(await buffer.Empty());
-            _workUnits = _builder!.BuildForSlot(0, new FahClientCpuSlotDescription(), null);
+            _builder = new FahClientWorkUnitCollectionBuilder(await buffer.Empty(), NullProteinService.Instance);
+            _workUnits = await _builder!.BuildForSlot(0, new FahClientCpuSlotDescription(), null);
         }
 
         [Test]
@@ -372,9 +372,9 @@ public class FahClientWorkUnitCollectionBuilderTests
             {
                 buffer.Add(message);
             }
-            _builder = new FahClientWorkUnitCollectionBuilder(await buffer.Empty());
+            _builder = new FahClientWorkUnitCollectionBuilder(await buffer.Empty(), NullProteinService.Instance);
             var slotDescription = new FahClientGpuSlotDescription { GpuBus = 13, GpuSlot = 0 };
-            _workUnits = _builder!.BuildForSlot(1, slotDescription, null);
+            _workUnits = await _builder!.BuildForSlot(1, slotDescription, null);
         }
 
         [Test]

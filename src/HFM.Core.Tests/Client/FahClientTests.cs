@@ -53,10 +53,11 @@ public class FahClientTests
             Assert.Multiple(() =>
             {
                 Assert.That(resources, Has.Count.EqualTo(2));
-                Assert.That(resources.All(x => x.Status != ClientResourceStatus.Unknown));
                 Assert.That(resources.All(x => x.SlotId >= 0));
                 Assert.That(resources.All(x => x.SlotDescription is not null));
+                Assert.That(resources.All(x => x.Status != ClientResourceStatus.Unknown));
                 Assert.That(resources.All(x => x.LogLines!.Count > 0));
+                Assert.That(resources.All(x => x.Platform is not null));
             });
         }
 
