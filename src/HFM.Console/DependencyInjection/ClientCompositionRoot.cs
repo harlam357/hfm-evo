@@ -4,7 +4,7 @@ using LightInject;
 
 namespace HFM.Console.DependencyInjection;
 
-internal class ClientCompositionRoot : ICompositionRoot
+internal sealed class ClientCompositionRoot : ICompositionRoot
 {
     public void Compose(IServiceRegistry serviceRegistry)
     {

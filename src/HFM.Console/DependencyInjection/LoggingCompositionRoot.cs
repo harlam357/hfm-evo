@@ -1,17 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using HFM.Core.Logging;
 
-using HFM.Core.Logging;
 using LightInject;
-
-using ProtoBuf.Meta;
 
 namespace HFM.Console.DependencyInjection;
 
-internal class LoggingCompositionRoot : ICompositionRoot
+internal sealed class LoggingCompositionRoot : ICompositionRoot
 {
     public void Compose(IServiceRegistry serviceRegistry)
     {
