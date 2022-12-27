@@ -31,7 +31,7 @@ public class FahClientMessageBuffer
         while (_messageQueue.TryDequeue(out FahClientMessage? message))
         {
             processedMessages.Add(message);
-            await UpdateMessages(message);
+            await UpdateMessages(message).ConfigureAwait(false);
         }
 
         return _messages with { ProcessedMessages = processedMessages };
@@ -61,7 +61,7 @@ public class FahClientMessageBuffer
                 break;
             case FahClientMessageType.LogRestart:
             case FahClientMessageType.LogUpdate:
-                await UpdateFahClientLog(message);
+                await UpdateFahClientLog(message).ConfigureAwait(false);
                 break;
             // ReSharper disable once RedundantEmptySwitchSection
             default:
@@ -95,14 +95,14 @@ public class FahClientMessageBuffer
         var logIsRetrieved = _log.ClientRuns.Count > 0;
         if (logIsRetrieved)
         {
-            await UpdateFahClientLogFromStringBuilder(logUpdate.Value);
+            await UpdateFahClientLogFromStringBuilder(logUpdate.Value).ConfigureAwait(false);
         }
         else
         {
             AppendToLogBuffer(logUpdate.Value);
             if (message.MessageText.Length < UInt16.MaxValue)
             {
-                await UpdateFahClientLogFromStringBuilder(_logBuffer!);
+                await UpdateFahClientLogFromStringBuilder(_logBuffer!).ConfigureAwait(false);
                 ReleaseLogBuffer();
             }
         }
