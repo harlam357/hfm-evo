@@ -11,7 +11,7 @@ public abstract class IdentityCollection<T> : IEnumerable<T> where T : IItemIden
 
     public int CurrentId { get; set; } = ItemIdentifier.NoId;
 
-    public T? Current => (T?)(_inner.Contains(CurrentId) ? _inner[CurrentId] : null);
+    public T? Current => this[CurrentId] ?? this[DefaultId];
 
     public void Add(T item) => _inner.Add(item);
 
