@@ -11,11 +11,12 @@ using LightInject.Microsoft.DependencyInjection;
 
 using Microsoft.Extensions.DependencyInjection;
 
-var exitEvent = new ManualResetEvent(false);
+using var exitEvent = new ManualResetEvent(false);
 
 Console.CancelKeyPress += (_, e) =>
 {
     e.Cancel = true;
+    // ReSharper disable once AccessToDisposedClosure
     exitEvent.Set();
 };
 

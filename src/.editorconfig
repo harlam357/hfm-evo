@@ -15,11 +15,6 @@ indent_style = space
 # Default severity for analyzer diagnostics - Requires **VS2019 16.5** or later
 dotnet_analyzer_diagnostic.severity = warning
 
-# CA1716: Identifiers should not match keywords
-dotnet_diagnostic.CA1716.severity = none
-# CA1720: Identifiers should not contain type names
-dotnet_diagnostic.CA1720.severity = none
-
 indent_size = 4
 insert_final_newline = true
 charset = utf-8-bom

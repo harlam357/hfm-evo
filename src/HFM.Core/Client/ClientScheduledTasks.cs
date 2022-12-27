@@ -38,7 +38,7 @@ public class ClientScheduledTasks : IDisposable
 
     public IScheduledTaskInfo WebArtifactsTask => _webArtifactsTask;
 
-    protected virtual void OnPreferenceChanged(object? sender, PreferenceChangedEventArgs e)
+    private void OnPreferenceChanged(object? sender, PreferenceChangedEventArgs e)
     {
 #pragma warning disable IDE0010 // Add missing cases
         switch (e.Preference)
@@ -63,7 +63,7 @@ public class ClientScheduledTasks : IDisposable
     }
 
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-    protected virtual void OnClientConfigurationChanged(object? sender, ClientConfigurationChangedEventArgs e)
+    private void OnClientConfigurationChanged(object? sender, ClientConfigurationChangedEventArgs e)
     {
         switch (e.Action)
         {
