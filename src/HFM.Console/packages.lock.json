@@ -31,6 +31,14 @@
         "resolved": "0.4.0",
         "contentHash": "Lb0QT05Bu8PctDeMZ6yQPtSn4HLyZG/FQf1mCfAMPFa2N07dRWDRfhFFdQlF7+soX+yyChdDqXWSsIrsy6he/g=="
       },
+      "HFM.Proteins": {
+        "type": "Transitive",
+        "resolved": "0.3.0",
+        "contentHash": "RSr0vRdqll00U2u0EeKCERah9IRb/+wZGONJVSzu7PtLEhD4Bf9+2IK0y+OmEYcVTseJneT+jgHg5cLJK3KRBQ==",
+        "dependencies": {
+          "Newtonsoft.Json": "11.0.1"
+        }
+      },
       "Microsoft.Extensions.DependencyInjection.Abstractions": {
         "type": "Transitive",
         "resolved": "7.0.0",
@@ -60,6 +68,7 @@
           "HFM.Client": "[0.6.0, )",
           "HFM.Log": "[0.4.0, )",
           "HFM.Preferences": "[1.0.0, )",
+          "HFM.Proteins": "[0.3.0, )",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "[7.0.0, )",
           "protobuf-net": "[3.1.25, )"
         }

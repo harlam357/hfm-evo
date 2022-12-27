@@ -1,10 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
     <RootNamespace>HFM.Core</RootNamespace>
     <IsPackable>false</IsPackable>
     <AnalysisLevel>latest-Recommended</AnalysisLevel>
+    <NoWarn>$(NoWarn);CA2201</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
