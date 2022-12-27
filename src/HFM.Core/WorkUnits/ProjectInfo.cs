@@ -26,7 +26,7 @@ public static class ProjectInfoExtensions
     /// Is the project information populated?
     /// </summary>
     /// <returns>true if Project (R/C/G) has been identified; otherwise, false.</returns>
-    public static bool HasProject(this IProjectInfo? projectInfo) =>
+    public static bool HasProject([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] this IProjectInfo? projectInfo) =>
         projectInfo != null &&
         (projectInfo.ProjectId != 0 ||
          projectInfo.ProjectRun != 0 ||
