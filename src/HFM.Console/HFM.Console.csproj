@@ -5,4 +5,13 @@
     <TargetFramework>net7.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="LightInject" Version="6.6.1" />
+    <PackageReference Include="LightInject.Microsoft.DependencyInjection" Version="3.6.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\HFM.Core\HFM.Core.csproj" />
+  </ItemGroup>
+
 </Project>
