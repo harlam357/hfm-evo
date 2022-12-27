@@ -7,6 +7,7 @@
   <ItemGroup>
     <PackageReference Include="HFM.Client" Version="0.6.0" />
     <PackageReference Include="HFM.Log" Version="0.4.0" />
+    <PackageReference Include="HFM.Proteins" Version="0.3.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
     <PackageReference Include="protobuf-net" Version="3.1.25" />
   </ItemGroup>

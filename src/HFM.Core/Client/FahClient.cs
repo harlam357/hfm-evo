@@ -116,6 +116,7 @@ public class FahClient : Client
 
             resources.Add(new FahClientResource
             {
+                Status = (ClientResourceStatus)Enum.Parse(typeof(ClientResourceStatus), slot.Status, true),
                 SlotId = slotId,
                 SlotDescription = slotDescription,
                 WorkUnit = workUnits.Current,
