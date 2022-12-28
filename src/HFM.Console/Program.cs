@@ -2,6 +2,7 @@
 
 using HFM.Console;
 using HFM.Console.DependencyInjection;
+using HFM.Console.ViewModels;
 using HFM.Core.Client;
 using HFM.Core.Logging;
 using HFM.Preferences;
@@ -28,10 +29,18 @@ using var services = new ServiceContainer();
 services.RegisterAssembly(Assembly.GetExecutingAssembly());
 var provider = services.CreateServiceProvider(EmptyServiceCollection.Instance);
 
+var preferences = InitializePreferences();
 var logger = ConfigureLogging();
 using var clientScheduledTasks = LoadClients(args[0]);
 
 exitEvent.WaitOne();
+
+IPreferences InitializePreferences()
+{
+    var p = provider.GetRequiredService<IPreferences>();
+    p.Load();
+    return p;
+}
 
 ILogger ConfigureLogging()
 {
@@ -64,7 +73,8 @@ ClientScheduledTasks LoadClients(string path)
     {
         foreach (var resource in configuration.SelectMany(x => x.Resources))
         {
-            logger.Info(resource.ToString());
+            var viewModel = ClientResourceViewModel.Create(resource, preferences);
+            logger.Info(viewModel.ToString()!);
         }
     };
     configuration.Load(settings!);
