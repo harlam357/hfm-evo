@@ -143,17 +143,17 @@ public abstract class ClientResourceViewModel
         sb.Append(delimiter);
         sb.Append(FormatFixedWidth($"{Progress.ToString(CultureInfo.InvariantCulture)}%", 4));
         sb.Append(delimiter);
-        sb.Append(FormatFixedWidth(ResourceType, 16));
+        sb.Append(FormatFixedWidth(ResourceType, 15));
         sb.Append(delimiter);
-        sb.Append(FormatFixedWidth(Processor, 32));
+        sb.Append(FormatFixedWidth(Processor, 31));
         sb.Append(delimiter);
         sb.Append(FormatFixedWidth(TPF.ToString(@"mm\:ss", CultureInfo.CurrentCulture), 5));
         sb.Append(delimiter);
-        sb.Append(FormatFixedWidth(PPD.ToString(CultureInfo.CurrentCulture), 10));
+        sb.Append(FormatFixedWidth(PPD.ToString(CultureInfo.CurrentCulture), 9));
         sb.Append(delimiter);
         sb.Append(FormatFixedWidth(ETA, 8));
         sb.Append(delimiter);
-        sb.Append(FormatFixedWidth(Core, 14));
+        sb.Append(FormatFixedWidth(Core, 13));
         sb.Append(delimiter);
         sb.Append(FormatFixedWidth(ProjectRunCloneGen, 24));
         sb.Append(delimiter);
@@ -171,7 +171,7 @@ public abstract class ClientResourceViewModel
     {
         if (value is null)
         {
-            return new string(Enumerable.Repeat(' ', width).ToArray());
+            return EmptyString(width);
         }
 
         if (value.Length > width)
@@ -181,9 +181,11 @@ public abstract class ClientResourceViewModel
 
         if (value.Length < width)
         {
-            return String.Concat(value, new string(Enumerable.Repeat(' ', width - value.Length).ToArray()));
+            return String.Concat(value, EmptyString(width - value.Length));
         }
 
         return value;
     }
+
+    private static string EmptyString(int length) => new(Enumerable.Repeat(' ', length).ToArray());
 }
