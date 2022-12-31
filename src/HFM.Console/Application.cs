@@ -16,6 +16,8 @@ internal static class Application
         DataFolderPath = dataFolderPath;
     }
 
+    internal const string Name = "HFM";
+
     private static string? _Version;
     /// <summary>
     /// Gets a string in the format Major.Minor.Build.
