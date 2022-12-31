@@ -139,14 +139,13 @@ public class FahClientWorkUnitCollectionBuilder
         return previousWorkUnit with
         {
             UnitRetrievalTime = GetUnitRetrievalTime(),
-
-            LogLines = LogLineEnumerable.Create(unitRun).ToList(),
-            Frames = (IReadOnlyDictionary<int, LogLineFrameData>)unitRun.Data.Frames,
             UnitStartTimeStamp = unitRun.Data.UnitStartTimeStamp ?? TimeSpan.MinValue,
-            FramesObserved = unitRun.Data.FramesObserved,
+            Finished = workUnitResult.IsTerminating ? DateTime.UtcNow : null,
             CoreVersion = ParseCoreVersion(unitRun.Data.CoreVersion),
             Result = workUnitResult,
-            Finished = workUnitResult.IsTerminating ? DateTime.UtcNow : null,
+            LogLines = LogLineEnumerable.Create(unitRun).ToList(),
+            Frames = (IReadOnlyDictionary<int, LogLineFrameData>)unitRun.Data.Frames,
+            FramesObserved = unitRun.Data.FramesObserved,
         };
     }
 

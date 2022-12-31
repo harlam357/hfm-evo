@@ -113,9 +113,9 @@ public class FahClient : Client
                 continue;
             }
 
-            // TODO: provide previousWorkUnit
             int slotId = slot.ID!.Value;
-            var workUnits = await workUnitCollectionBuilder.BuildForSlot(slotId, slotDescription, null).ConfigureAwait(false);
+            var previousWorkUnit = Resources?.Cast<FahClientResource>().FirstOrDefault(x => x.SlotId == slotId)?.WorkUnit;
+            var workUnits = await workUnitCollectionBuilder.BuildForSlot(slotId, slotDescription, previousWorkUnit).ConfigureAwait(false);
             var currentWorkUnit = workUnits.Current;
             var status = (ClientResourceStatus)Enum.Parse(typeof(ClientResourceStatus), slot.Status, true);
 
