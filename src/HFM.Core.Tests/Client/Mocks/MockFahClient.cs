@@ -27,8 +27,14 @@ public class MockFahClient : FahClient
     protected override async Task OnRefresh()
     {
         await base.OnRefresh();
-        LastMessages = Messages;
-        LastResources = Resources;
+        if (Messages is not null)
+        {
+            LastMessages = Messages;
+        }
+        if (Resources is not null)
+        {
+            LastResources = Resources;
+        }
     }
 
     public new Task? ReadMessagesTask => base.ReadMessagesTask;
