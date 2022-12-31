@@ -108,6 +108,9 @@ public record WorkUnit : IProjectInfo, IItemIdentifier
         }
     }
 
+    public bool ShouldUseBenchmarkFrameTime(PpdCalculation ppdCalculation) =>
+        this.HasProject() && GetRawTime(ppdCalculation) == 0;
+
     public int Progress => Protein is null ? 0 : FramesComplete * 100 / Protein.Frames;
 
     /// <summary>

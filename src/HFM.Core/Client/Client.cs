@@ -15,7 +15,7 @@ public interface IClient
     /// <summary>
     /// Gets the collection of client resources.
     /// </summary>
-    IReadOnlyCollection<ClientResource> Resources { get; }
+    IReadOnlyCollection<ClientResource>? Resources { get; }
 }
 
 internal interface ISetClientSettings
@@ -85,8 +85,7 @@ public abstract class Client : IClient, ISetClientSettings
 
     private List<ClientResource>? _resources;
 
-    public IReadOnlyCollection<ClientResource> Resources =>
-        _resources is null ? Array.Empty<ClientResource>() : _resources;
+    public IReadOnlyCollection<ClientResource>? Resources => _resources;
 
     protected void SetResources(IEnumerable<ClientResource>? resources)
     {

@@ -30,16 +30,10 @@ public abstract class ClientResourceViewModel
     }
 
     public virtual ClientResourceStatus Status =>
-        _clientResource.Status == ClientResourceStatus.Running
-            ? IsUsingBenchmarkFrameTime
-                ? ClientResourceStatus.RunningNoFrameTimes
-                : ClientResourceStatus.Running
-            : _clientResource.Status;
+        _clientResource.CalculateStatus(PpdCalculation);
 
     public virtual int Progress =>
-        Status.IsRunning() || Status == ClientResourceStatus.Paused
-            ? _clientResource.Progress
-            : 0;
+        _clientResource.CalculateProgress(PpdCalculation);
 
     public virtual string? Name { get; set; }
 
@@ -48,50 +42,29 @@ public abstract class ClientResourceViewModel
     public abstract string Processor { get; }
 
     public virtual TimeSpan TPF =>
-        Status.IsRunning()
-            ? _clientResource.WorkUnit?.GetFrameTime(PpdCalculation) ?? TimeSpan.Zero
-            : TimeSpan.Zero;
+        _clientResource.GetFrameTime(PpdCalculation);
 
     public virtual double PPD =>
-        Status.IsRunning()
-            ? Math.Round(_clientResource.WorkUnit?.GetPpd(PpdCalculation, BonusCalculation) ?? 0.0, DecimalPlaces)
-            : 0.0;
+        Math.Round(_clientResource.GetPpd(PpdCalculation, BonusCalculation), DecimalPlaces);
 
-    public virtual string ETA
+    public virtual ClientResourceEtaValue ETA
     {
         get
         {
-            var eta = _clientResource.WorkUnit?.GetEta(PpdCalculation);
-            return eta is null
-                ? String.Empty
-                : Status.IsRunning()
-                    ? EtaAsDate
-                        ? _clientResource.WorkUnit?.UnitRetrievalTime.Add(eta.Value).ToLocalTime().ToString(CultureInfo.CurrentCulture) ?? String.Empty
-                        : eta.Value.ToString()
-                    : String.Empty;
+            TimeSpan eta = _clientResource.GetEta(PpdCalculation);
+            DateTime? etaDate = EtaAsDate ? _clientResource.GetEtaDate(PpdCalculation) : null;
+            return new ClientResourceEtaValue(eta, etaDate);
         }
     }
 
-    public virtual string Core
-    {
-        get
-        {
-            var core = _clientResource.WorkUnit?.Protein?.Core;
-            var coreVersion = _clientResource.WorkUnit?.CoreVersion;
-
-            return (ShowVersions && coreVersion is not null
-                ? String.Format(CultureInfo.InvariantCulture, "{0} ({1})", core, coreVersion)
-                : core) ?? String.Empty;
-        }
-    }
+    public virtual string Core =>
+        _clientResource.GetCore(ShowVersions);
 
     public virtual string ProjectRunCloneGen =>
-        _clientResource.WorkUnit.ToShortProjectString();
+        _clientResource.WorkUnit?.ToShortProjectString() ?? String.Empty;
 
     public virtual double Credit =>
-        Status.IsRunning()
-            ? Math.Round(_clientResource.WorkUnit?.GetCredit(PpdCalculation, BonusCalculation) ?? 0.0, DecimalPlaces)
-            : _clientResource.WorkUnit?.Protein?.Credit ?? 0.0;
+        Math.Round(_clientResource.GetCredit(PpdCalculation, BonusCalculation), DecimalPlaces);
 
     public virtual int Completed { get; set; }
 
@@ -108,9 +81,6 @@ public abstract class ClientResourceViewModel
 
     public IReadOnlyCollection<LogLine>? LogLines => _clientResource.LogLines;
 
-    private bool IsUsingBenchmarkFrameTime =>
-        _clientResource.WorkUnit.HasProject() && _clientResource.WorkUnit.GetRawTime(PpdCalculation) == 0;
-
     protected PpdCalculation PpdCalculation => _preferences.Get<PpdCalculation>(Preference.PPDCalculation);
 
     protected BonusCalculation BonusCalculation
@@ -118,13 +88,7 @@ public abstract class ClientResourceViewModel
         get
         {
             var bonusCalculation = _preferences.Get<BonusCalculation>(Preference.BonusCalculation);
-            if (bonusCalculation != BonusCalculation.None)
-            {
-                bonusCalculation = Status == ClientResourceStatus.RunningNoFrameTimes
-                    ? BonusCalculation.FrameTime
-                    : bonusCalculation;
-            }
-            return bonusCalculation;
+            return _clientResource.NormalizeBonusCalculation(PpdCalculation, bonusCalculation);
         }
     }
 
@@ -151,7 +115,7 @@ public abstract class ClientResourceViewModel
         sb.Append(delimiter);
         sb.Append(FormatFixedWidth(PPD.ToString(CultureInfo.CurrentCulture), 9));
         sb.Append(delimiter);
-        sb.Append(FormatFixedWidth(ETA, 8));
+        sb.Append(FormatFixedWidth(ETA.ToString(CultureInfo.CurrentCulture), 8));
         sb.Append(delimiter);
         sb.Append(FormatFixedWidth(Core, 13));
         sb.Append(delimiter);

@@ -124,7 +124,6 @@ public class FahClient : Client
                 SlotId = slotId,
                 SlotDescription = slotDescription,
                 Status = status,
-                Progress = currentWorkUnit?.Progress ?? 0,
                 WorkUnit = currentWorkUnit,
                 LogLines = EnumerateLogLines(messages.ClientRun, slotId, workUnits.Current),
                 Platform = messages.Info is null ? null : new ClientPlatform(messages.Info.Client.Version, messages.Info.System.OS)
@@ -282,6 +281,7 @@ public class FahClient : Client
         MessageBuffer.Add(message);
         if (MessageBuffer.ContainsAny(_RefreshMessageTypes))
         {
+            // TODO: Consider firing this Refresh as a new Task
             await Refresh().ConfigureAwait(false);
         }
     }
