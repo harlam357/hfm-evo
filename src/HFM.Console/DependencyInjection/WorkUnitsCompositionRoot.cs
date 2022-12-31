@@ -4,6 +4,7 @@ using LightInject;
 
 namespace HFM.Console.DependencyInjection;
 
+[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 internal sealed class WorkUnitsCompositionRoot : ICompositionRoot
 {
     public void Compose(IServiceRegistry serviceRegistry)
