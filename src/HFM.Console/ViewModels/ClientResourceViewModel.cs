@@ -38,9 +38,11 @@ public abstract class ClientResourceViewModel
     public virtual string? Name =>
         _clientResource.ClientIdentifier.ToString();
 
-    public abstract string ResourceType { get; }
+    public virtual string ResourceType =>
+        _clientResource.GetResourceType(ShowVersions);
 
-    public abstract string Processor { get; }
+    public virtual string Processor =>
+        _clientResource.GetProcessor(ShowVersions);
 
     public virtual TimeSpan TPF =>
         _clientResource.GetFrameTime(PpdCalculation);

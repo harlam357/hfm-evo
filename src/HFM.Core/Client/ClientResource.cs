@@ -38,6 +38,12 @@ public record ClientResource
             : 0;
     }
 
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    public virtual string GetResourceType(bool showVersions) => Unknown.Value;
+
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    public virtual string GetProcessor(bool showVersions) => Unknown.Value;
+
     public TimeSpan GetFrameTime(PpdCalculation ppdCalculation)
     {
         var status = CalculateStatus(ppdCalculation);
