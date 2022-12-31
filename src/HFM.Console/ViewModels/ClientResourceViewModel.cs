@@ -35,7 +35,8 @@ public abstract class ClientResourceViewModel
     public virtual int Progress =>
         _clientResource.CalculateProgress(PpdCalculation);
 
-    public virtual string? Name { get; set; }
+    public virtual string? Name =>
+        _clientResource.ClientIdentifier.ToString();
 
     public abstract string ResourceType { get; }
 
@@ -98,18 +99,85 @@ public abstract class ClientResourceViewModel
 
     protected bool EtaAsDate => _preferences.Get<bool>(Preference.DisplayEtaAsDate);
 
+    public static string HeaderString()
+    {
+        const string delimiter = " | ";
+
+        var sb = new StringBuilder();
+        sb.Append(FormatFixedWidth("Status", 9));
+        sb.Append(delimiter);
+        sb.Append(FormatFixedWidth("Prog", 4));
+        sb.Append(delimiter);
+        sb.Append(FormatFixedWidth("Name", 19));
+        sb.Append(delimiter);
+        sb.Append(FormatFixedWidth("Resource Type", 15));
+        sb.Append(delimiter);
+        sb.Append(FormatFixedWidth("Processor", 20));
+        sb.Append(delimiter);
+        sb.Append(FormatFixedWidth("TPF", 5));
+        sb.Append(delimiter);
+        sb.Append(FormatFixedWidth("PPD", 9));
+        sb.Append(delimiter);
+        sb.Append(FormatFixedWidth("ETA", 8));
+        sb.Append(delimiter);
+        sb.Append(FormatFixedWidth("Core", 13));
+        sb.Append(delimiter);
+        sb.Append(FormatFixedWidth("Project (R, C, G)", 24));
+        sb.Append(delimiter);
+        sb.Append(FormatFixedWidth("Credit", 8));
+        sb.Append(delimiter);
+        sb.Append(FormatFixedWidth("Identity", 16));
+        //sb.Append(delimiter);
+        //sb.Append(FormatFixedWidth(Assigned.ToString(CultureInfo.CurrentCulture), 22));
+        //sb.Append(delimiter);
+        //sb.Append(FormatFixedWidth(Timeout.ToString(CultureInfo.CurrentCulture), 22));
+
+        sb.AppendLine();
+        sb.Append(BarString(9));
+        sb.Append(delimiter);
+        sb.Append(BarString(4));
+        sb.Append(delimiter);
+        sb.Append(BarString(19));
+        sb.Append(delimiter);
+        sb.Append(BarString(15));
+        sb.Append(delimiter);
+        sb.Append(BarString(20));
+        sb.Append(delimiter);
+        sb.Append(BarString(5));
+        sb.Append(delimiter);
+        sb.Append(BarString(9));
+        sb.Append(delimiter);
+        sb.Append(BarString(8));
+        sb.Append(delimiter);
+        sb.Append(BarString(13));
+        sb.Append(delimiter);
+        sb.Append(BarString(24));
+        sb.Append(delimiter);
+        sb.Append(BarString(8));
+        sb.Append(delimiter);
+        sb.Append(BarString(16));
+        //sb.Append(delimiter);
+        //sb.Append(BarString(22));
+        //sb.Append(delimiter);
+        //sb.Append(BarString(22));
+
+        return sb.ToString();
+    }
+
     public override string ToString()
     {
         const string delimiter = " | ";
 
         var sb = new StringBuilder();
-        sb.Append(FormatFixedWidth(Status.ToString(), 10));
+        sb.Append(FormatFixedWidth(Status.ToString(), 9));
         sb.Append(delimiter);
         sb.Append(FormatFixedWidth($"{Progress.ToString(CultureInfo.InvariantCulture)}%", 4));
         sb.Append(delimiter);
+        sb.Append(FormatFixedWidth(Name, 19));
+        sb.Append(delimiter);
         sb.Append(FormatFixedWidth(ResourceType, 15));
         sb.Append(delimiter);
-        sb.Append(FormatFixedWidth(Processor, 31));
+        sb.Append(FormatFixedWidth(Processor, 20));
         sb.Append(delimiter);
         sb.Append(FormatFixedWidth(TPF.ToString(@"mm\:ss", CultureInfo.CurrentCulture), 5));
         sb.Append(delimiter);
@@ -152,4 +220,6 @@ public abstract class ClientResourceViewModel
     }
 
     private static string EmptyString(int length) => new(Enumerable.Repeat(' ', length).ToArray());
+
+    private static string BarString(int length) => new(Enumerable.Repeat('-', length).ToArray());
 }

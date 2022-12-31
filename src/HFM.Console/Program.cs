@@ -71,6 +71,7 @@ ClientScheduledTasks LoadClients(string path)
     var configuration = provider.GetRequiredService<ClientConfiguration>();
     configuration.ClientConfigurationChanged += (_, _) =>
     {
+        logger.Info(ClientResourceViewModel.HeaderString());
         foreach (var resource in configuration.SelectMany(x => x.Resources ?? Array.Empty<ClientResource>()))
         {
             var viewModel = ClientResourceViewModel.Create(resource, preferences);
