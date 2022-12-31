@@ -4,6 +4,8 @@ public interface IClient
 {
     event EventHandler<ClientChangedEventArgs>? ClientChanged;
 
+    ClientIdentifier ClientIdentifier { get; }
+
     ClientSettings? Settings { get; }
 
     bool Connected { get; }
@@ -29,6 +31,8 @@ public abstract class Client : IClient, ISetClientSettings
 
     protected virtual void OnClientChanged(ClientChangedEventArgs args) =>
         ClientChanged?.Invoke(this, args);
+
+    public ClientIdentifier ClientIdentifier => ClientIdentifier.FromSettings(Settings);
 
     public ClientSettings? Settings { get; protected set; }
 

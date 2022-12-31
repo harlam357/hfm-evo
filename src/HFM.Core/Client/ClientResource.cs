@@ -7,6 +7,8 @@ namespace HFM.Core.Client;
 
 public record ClientResource
 {
+    public ClientIdentifier ClientIdentifier { get; init; }
+
     public ClientResourceStatus Status { get; init; }
 
     public WorkUnit? WorkUnit { get; init; }

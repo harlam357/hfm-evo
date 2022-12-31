@@ -101,11 +101,16 @@ public readonly partial struct ClientIdentifier : IEquatable<ClientIdentifier>, 
     [GeneratedRegex("(?<Server>.+)[-:](?<Port>\\d+)$", RegexOptions.ExplicitCapture)]
     private static partial Regex FromConnectionStringRegex();
 
-    public static ClientIdentifier FromConnectionString(string name, string? connectionString, Guid guid)
+    public static ClientIdentifier FromConnectionString(string? name, string? connectionString, Guid guid)
     {
         var match = connectionString is null ? null : FromConnectionStringRegex().Match(connectionString);
         return match is { Success: true }
             ? new ClientIdentifier(name, match.Groups["Server"].Value, Convert.ToInt32(match.Groups["Port"].Value, CultureInfo.InvariantCulture), guid)
             : new ClientIdentifier(name, connectionString, ClientSettings.NoPort, guid);
     }
+
+    public static ClientIdentifier FromSettings(ClientSettings? settings) =>
+        settings is null
+            ? new ClientIdentifier()
+            : new ClientIdentifier(settings.Name, settings.Server, settings.Port, settings.Guid);
 }

@@ -104,6 +104,7 @@ public class FahClient : Client
 
         var resources = new List<FahClientResource>();
 
+        var clientIdentifier = ClientIdentifier;
         var workUnitCollectionBuilder = new FahClientWorkUnitCollectionBuilder(messages, _proteinService);
         foreach (var slot in messages.SlotCollection.Where(x => x.ID.HasValue))
         {
@@ -121,8 +122,12 @@ public class FahClient : Client
 
             resources.Add(new FahClientResource
             {
+                // FahClient
+                SlotIdentifier = new FahClientSlotIdentifier(clientIdentifier, slotId),
                 SlotId = slotId,
                 SlotDescription = slotDescription,
+                // Client
+                ClientIdentifier = clientIdentifier,
                 Status = status,
                 WorkUnit = currentWorkUnit,
                 LogLines = EnumerateLogLines(messages.ClientRun, slotId, workUnits.Current),
