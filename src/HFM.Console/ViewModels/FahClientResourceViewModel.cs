@@ -13,5 +13,5 @@ internal class FahClientResourceViewModel : ClientResourceViewModel
     }
 
     public override string Name =>
-        _clientResource.SlotIdentifier.ToString();
+        _clientResource.SlotIdentifier.Name;
 }

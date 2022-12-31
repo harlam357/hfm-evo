@@ -39,10 +39,10 @@ public record ClientResource
     }
 
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-    public virtual string GetResourceType(bool showVersions) => Unknown.Value;
+    public virtual string GetResourceType(bool showVersions) => String.Empty;
 
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-    public virtual string GetProcessor(bool showVersions) => Unknown.Value;
+    public virtual string GetProcessor(bool showVersions) => String.Empty;
 
     public TimeSpan GetFrameTime(PpdCalculation ppdCalculation)
     {
@@ -106,4 +106,11 @@ public record ClientResource
         }
         return bonusCalculation;
     }
+
+    public static ClientResource Offline(ClientSettings settings) =>
+        new()
+        {
+            ClientIdentifier = ClientIdentifier.FromSettings(settings),
+            Status = ClientResourceStatus.Offline
+        };
 }

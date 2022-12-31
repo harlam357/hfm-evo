@@ -8,12 +8,12 @@ using HFM.Preferences;
 
 namespace HFM.Console.ViewModels;
 
-public abstract class ClientResourceViewModel
+public class ClientResourceViewModel
 {
     private readonly ClientResource _clientResource;
     private readonly IPreferences _preferences;
 
-    protected ClientResourceViewModel(ClientResource clientResource, IPreferences preferences)
+    public ClientResourceViewModel(ClientResource clientResource, IPreferences preferences)
     {
         _clientResource = clientResource;
         _preferences = preferences;
@@ -26,7 +26,7 @@ public abstract class ClientResourceViewModel
             return new FahClientResourceViewModel(r, preferences);
         }
 
-        throw new ArgumentException("client resource type is invalid.", nameof(clientResource));
+        return new ClientResourceViewModel(clientResource, preferences);
     }
 
     public virtual ClientResourceStatus Status =>
@@ -36,7 +36,7 @@ public abstract class ClientResourceViewModel
         _clientResource.CalculateProgress(PpdCalculation);
 
     public virtual string? Name =>
-        _clientResource.ClientIdentifier.ToString();
+        _clientResource.ClientIdentifier.Name;
 
     public virtual string ResourceType =>
         _clientResource.GetResourceType(ShowVersions);
@@ -108,7 +108,7 @@ public abstract class ClientResourceViewModel
         var sb = new StringBuilder();
         sb.Append(FormatFixedWidth("Status", 9));
         sb.Append(delimiter);
-        sb.Append(FormatFixedWidth("Prog", 4));
+        sb.Append(FormatFixedWidth("%", 4));
         sb.Append(delimiter);
         sb.Append(FormatFixedWidth("Name", 19));
         sb.Append(delimiter);
