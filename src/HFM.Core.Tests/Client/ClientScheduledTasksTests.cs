@@ -25,7 +25,7 @@ public class ClientScheduledTasksTests : IDisposable
             NullLogger.Instance,
             _preferences,
             _configuration,
-            NullWebArtifactDeployment.Instance);
+            NullWebGenerationArtifactDeployment.Instance);
 
         return Task.CompletedTask;
     }

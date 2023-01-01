@@ -13,17 +13,21 @@ public class ClientScheduledTasks : IDisposable
     private readonly ILogger _logger;
     private readonly IPreferences _preferences;
     private readonly ClientConfiguration _clientConfiguration;
-    private readonly IWebArtifactDeployment _webArtifactDeployment;
+    private readonly IWebGenerationArtifactDeployment _artifactDeployment;
 
     private readonly ScheduledTask _clientRefreshTask;
     private readonly ScheduledTask _webArtifactsTask;
 
-    public ClientScheduledTasks(ILogger logger, IPreferences preferences, ClientConfiguration clientConfiguration, IWebArtifactDeployment webArtifactDeployment)
+    public ClientScheduledTasks(
+        ILogger logger,
+        IPreferences preferences,
+        ClientConfiguration clientConfiguration,
+        IWebGenerationArtifactDeployment artifactDeployment)
     {
         _logger = logger;
         _preferences = preferences;
         _clientConfiguration = clientConfiguration;
-        _webArtifactDeployment = webArtifactDeployment;
+        _artifactDeployment = artifactDeployment;
 
         _preferences.PreferenceChanged += OnPreferenceChanged;
         _clientConfiguration.ClientConfigurationChanged += OnClientConfigurationChanged;
@@ -202,7 +206,7 @@ public class ClientScheduledTasks : IDisposable
     {
         ct.ThrowIfCancellationRequested();
 
-        _webArtifactDeployment.Deploy(ct);
+        _artifactDeployment.Deploy(ct);
     }
 
     public void Dispose()

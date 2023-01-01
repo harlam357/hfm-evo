@@ -9,6 +9,6 @@ internal sealed class ArtifactsCompositionRoot : ICompositionRoot
 {
     public void Compose(IServiceRegistry serviceRegistry)
     {
-        serviceRegistry.AddSingleton<IWebArtifactDeployment, NullWebArtifactDeployment>();
+        serviceRegistry.AddSingleton((IWebGenerationArtifactDeployment)NullWebGenerationArtifactDeployment.Instance);
     }
 }

@@ -16,6 +16,12 @@ internal static class LightInjectExtensions
         return container;
     }
 
+    internal static IServiceRegistry AddSingleton<TService>(this IServiceRegistry container, TService instance)
+    {
+        container.RegisterInstance(instance);
+        return container;
+    }
+
     internal static IServiceRegistry AddSingleton<TService, TImplementation>(this IServiceRegistry container) where TImplementation : TService
     {
         container.Register<TService, TImplementation>(new PerContainerLifetime());

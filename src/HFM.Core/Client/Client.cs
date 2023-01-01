@@ -44,6 +44,7 @@ public abstract class Client : IClient, ISetClientSettings
 
     private int _refreshLock;
 
+    // TODO: all methods called by Refresh() should accept a CancellationToken
     public async Task Refresh(CancellationToken cancellationToken = default)
     {
         if (ClientCannotRefresh())

@@ -1,14 +1,14 @@
 ﻿namespace HFM.Core.Artifacts;
 
-public interface IWebArtifactDeployment
+public interface IArtifactDeployment
 {
     void Deploy(CancellationToken cancellationToken = default);
 }
 
 [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-public sealed class NullWebArtifactDeployment : IWebArtifactDeployment
+public sealed class NullArtifactDeployment : IArtifactDeployment
 {
-    public static NullWebArtifactDeployment Instance { get; } = new();
+    public static NullArtifactDeployment Instance { get; } = new();
 
     public void Deploy(CancellationToken cancellationToken = default)
     {
