@@ -129,6 +129,8 @@ public class FahClient : Client
                 // Client
                 ClientIdentifier = clientIdentifier,
                 Status = status,
+                // TODO: query work unit database for completed and failed values
+                CompletedAndFailedWorkUnits = new CompletedAndFailedWorkUnits(),
                 WorkUnit = currentWorkUnit,
                 LogLines = EnumerateLogLines(messages.ClientRun, slotId, workUnits.Current),
                 Platform = messages.Info is null ? null : new ClientPlatform(messages.Info.Client.Version, messages.Info.System.OS)

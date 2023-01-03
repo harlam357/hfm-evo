@@ -104,6 +104,10 @@ public class ClientResourceTests
                 Assert.That(_resource!.GetPpd(PpdCalculation.LastThreeFrames, BonusCalculation.FrameTime), Is.Not.EqualTo(0.0));
 
             [Test]
+            public void ThenUpdIsCalculated() =>
+                Assert.That(_resource!.GetUpd(PpdCalculation.LastThreeFrames), Is.Not.EqualTo(0.0));
+
+            [Test]
             public void ThenCreditIsCalculated() =>
                 Assert.That(_resource!.GetCredit(PpdCalculation.LastThreeFrames, BonusCalculation.FrameTime), Is.Not.EqualTo(0.0));
 
@@ -170,6 +174,10 @@ public class ClientResourceTests
             [Test]
             public void ThenZeroPpdIsCalculated() =>
                 Assert.That(_resource!.GetPpd(PpdCalculation.LastThreeFrames, BonusCalculation.FrameTime), Is.EqualTo(0.0));
+
+            [Test]
+            public void ThenZeroUpdIsCalculated() =>
+                Assert.That(_resource!.GetUpd(PpdCalculation.LastThreeFrames), Is.EqualTo(0.0));
 
             [Test]
             public void ThenBaseCreditIsCalculated() =>

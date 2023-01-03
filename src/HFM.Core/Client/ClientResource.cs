@@ -11,6 +11,8 @@ public record ClientResource
 
     public ClientResourceStatus Status { get; init; }
 
+    public CompletedAndFailedWorkUnits CompletedAndFailedWorkUnits { get; init; }
+
     public WorkUnit? WorkUnit { get; init; }
 
     public IReadOnlyCollection<LogLine>? LogLines { get; init; }
@@ -57,6 +59,14 @@ public record ClientResource
         var status = CalculateStatus(ppdCalculation);
         return status.IsRunning()
             ? WorkUnit?.GetPpd(ppdCalculation, bonusCalculation) ?? 0.0
+            : 0.0;
+    }
+
+    public double GetUpd(PpdCalculation ppdCalculation)
+    {
+        var status = CalculateStatus(ppdCalculation);
+        return status.IsRunning()
+            ? WorkUnit?.GetUpd(ppdCalculation) ?? 0.0
             : 0.0;
     }
 
@@ -107,6 +117,7 @@ public record ClientResource
         return bonusCalculation;
     }
 
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public static ClientResource Offline(ClientSettings settings) =>
         new()
         {
