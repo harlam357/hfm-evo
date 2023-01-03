@@ -3,6 +3,7 @@ using System.Xml;
 
 namespace HFM.Core.Serializers;
 
+[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 public class DataContractFileSerializer<T> : IFileSerializer<T> where T : class, new()
 {
     public string FileExtension => "xml";

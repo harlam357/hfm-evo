@@ -25,6 +25,7 @@ public enum SortMode
 /// Represents a comparer that supports comparing one or more properties of two objects.
 /// </summary>
 /// <typeparam name="T">The type of objects to compare.</typeparam>
+[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 public class SortComparer<T> : IComparer<T>
 {
     /// <summary>
@@ -34,11 +35,11 @@ public class SortComparer<T> : IComparer<T>
     {
         get
         {
-            if (Property != null)
+            if (Property is not null)
             {
                 return SortMode.Simple;
             }
-            if (SortDescriptions != null)
+            if (SortDescriptions is not null)
             {
                 return SortMode.Advanced;
             }
@@ -101,11 +102,11 @@ public class SortComparer<T> : IComparer<T>
     public int Compare(T? x, T? y)
     {
         // Knowing how to sort is dependent on what sorting properties are set
-        if (SupportsSorting && Property != null)
+        if (SupportsSorting && Property is not null)
         {
             return CompareInternal(x, y);
         }
-        if (SupportsAdvancedSorting && SortDescriptions != null)
+        if (SupportsAdvancedSorting && SortDescriptions is not null)
         {
             return RecursiveCompareInternal(x, y, 0);
         }
@@ -165,15 +166,15 @@ public class SortComparer<T> : IComparer<T>
     {
         int result;
 
-        if (xValue == null && yValue == null)
+        if (xValue is null && yValue is null)
         {
             result = 0;
         }
-        else if (xValue == null)
+        else if (xValue is null)
         {
             result = -1;
         }
-        else if (yValue == null)
+        else if (yValue is null)
         {
             result = 1;
         }
