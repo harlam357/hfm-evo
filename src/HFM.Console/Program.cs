@@ -85,7 +85,7 @@ ClientScheduledTasks LoadClients(string path)
         logger.Info(ClientResourceViewModel.HeaderString());
         foreach (var resource in configuration.SelectMany(x => x.Resources ?? new[] { ClientResource.Offline(x.Settings!) }))
         {
-            var viewModel = ClientResourceViewModel.Create(resource, preferences);
+            var viewModel = new ClientResourceViewModel(resource, preferences);
             logger.Info(viewModel.ToString());
         }
     };

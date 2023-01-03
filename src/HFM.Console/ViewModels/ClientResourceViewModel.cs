@@ -19,68 +19,56 @@ public class ClientResourceViewModel
         _preferences = preferences;
     }
 
-    public static ClientResourceViewModel Create(ClientResource clientResource, IPreferences preferences)
-    {
-        if (clientResource is FahClientResource r)
-        {
-            return new FahClientResourceViewModel(r, preferences);
-        }
-
-        return new ClientResourceViewModel(clientResource, preferences);
-    }
-
-    public virtual ClientResourceStatus Status =>
+    public ClientResourceStatus Status =>
         _clientResource.CalculateStatus(PpdCalculation);
 
-    public virtual int Progress =>
+    public int Progress =>
         _clientResource.CalculateProgress(PpdCalculation);
 
-    public virtual string? Name =>
-        _clientResource.ClientIdentifier.Name;
+    public string? Name =>
+        _clientResource.GetName();
 
-    public virtual string ResourceType =>
+    public string ResourceType =>
         _clientResource.GetResourceType(ShowVersions);
 
-    public virtual string Processor =>
+    public string Processor =>
         _clientResource.GetProcessor(ShowVersions);
 
-    public virtual TimeSpan TPF =>
+    public TimeSpan TPF =>
         _clientResource.GetFrameTime(PpdCalculation);
 
-    public virtual double PPD =>
+    public double PPD =>
         Math.Round(_clientResource.GetPpd(PpdCalculation, BonusCalculation), DecimalPlaces);
 
-    public virtual ClientResourceEtaValue ETA
+    public ClientResourceEtaValue ETA
     {
         get
         {
             TimeSpan eta = _clientResource.GetEta(PpdCalculation);
             DateTime? etaDate = EtaAsDate ? _clientResource.GetEtaDate(PpdCalculation) : null;
-            return new ClientResourceEtaValue(eta, etaDate);
+            return new(eta, etaDate);
         }
     }
 
-    public virtual string Core =>
+    public string Core =>
         _clientResource.GetCore(ShowVersions);
 
-    public virtual string ProjectRunCloneGen =>
+    public string ProjectRunCloneGen =>
         _clientResource.WorkUnit?.ToShortProjectString() ?? String.Empty;
 
-    public virtual double Credit =>
+    public double Credit =>
         Math.Round(_clientResource.GetCredit(PpdCalculation, BonusCalculation), DecimalPlaces);
 
-    public virtual int Completed { get; set; }
+    public int Completed { get; set; }
 
-    public virtual int Failed { get; set; }
+    public int Failed { get; set; }
 
-    public virtual string DonorIdentity =>
-        String.IsNullOrWhiteSpace(_clientResource.WorkUnit?.DonorName)
-            ? String.Empty
-            : String.Format(CultureInfo.InvariantCulture, "{0} ({1})", _clientResource.WorkUnit.DonorName, _clientResource.WorkUnit.DonorTeam);
+    public string DonorIdentity =>
+        _clientResource.GetIdentity();
 
-    public virtual DateTime Assigned => _clientResource.WorkUnit?.Assigned.ToLocalTime() ?? default;
+    public DateTime Assigned => _clientResource.WorkUnit?.Assigned.ToLocalTime() ?? default;
 
-    public virtual DateTime Timeout => _clientResource.WorkUnit?.Timeout.ToLocalTime() ?? default;
+    public DateTime Timeout => _clientResource.WorkUnit?.Timeout.ToLocalTime() ?? default;
 
     public IReadOnlyCollection<LogLine>? LogLines => _clientResource.LogLines;
 
