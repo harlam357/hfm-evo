@@ -20,18 +20,6 @@ public class ClientSettingsTests
         Assert.That(settings.ClientIdentifier, Is.EqualTo(expected));
     }
 
-    [Test]
-    public void HasClientLogFileName()
-    {
-        var settings = new ClientSettings
-        {
-            Name = "Foo",
-        };
-
-        const string expected = "Foo-log.txt";
-        Assert.That(settings.ClientLogFileName, Is.EqualTo(expected));
-    }
-
     [TestCase("+a+", ExpectedResult = true)]
     [TestCase("=a=", ExpectedResult = true)]
     [TestCase("-a-", ExpectedResult = true)]

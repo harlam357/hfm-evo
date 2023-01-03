@@ -56,10 +56,6 @@ public record ClientSettings
     [DataMember(Order = 7)]
     public bool Disabled { get; init; }
 
-    private const string FahClientLogFileName = "log.txt";
-
-    public string ClientLogFileName => String.Format(CultureInfo.InvariantCulture, "{0}-{1}", Name, FahClientLogFileName);
-
     public const int NoPort = 0;
 
     /// <summary>
