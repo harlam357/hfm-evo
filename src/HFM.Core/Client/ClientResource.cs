@@ -7,6 +7,9 @@ namespace HFM.Core.Client;
 
 public record ClientResource
 {
+    // TODO: might need to live at the Client level
+    public string LogFileName => String.Format(CultureInfo.InvariantCulture, "{0}-{1}", ClientIdentifier.Name, "log.txt");
+
     public ClientIdentifier ClientIdentifier { get; init; }
 
     public ClientResourceStatus Status { get; init; }
@@ -39,6 +42,8 @@ public record ClientResource
             ? WorkUnit?.Progress ?? 0
             : 0;
     }
+
+    public virtual string? GetName() => ClientIdentifier.Name;
 
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public virtual string GetResourceType(bool showVersions) => String.Empty;
@@ -103,6 +108,11 @@ public record ClientResource
             ? String.Format(CultureInfo.InvariantCulture, "{0} ({1})", core, coreVersion)
             : core) ?? String.Empty;
     }
+
+    public string GetIdentity() =>
+        String.IsNullOrWhiteSpace(WorkUnit?.DonorName)
+            ? String.Empty
+            : String.Format(CultureInfo.InvariantCulture, "{0} ({1})", WorkUnit.DonorName, WorkUnit.DonorTeam);
 
     public BonusCalculation NormalizeBonusCalculation(PpdCalculation ppdCalculation, BonusCalculation bonusCalculation)
     {
