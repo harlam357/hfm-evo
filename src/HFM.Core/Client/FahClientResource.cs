@@ -13,6 +13,8 @@ public record FahClientResource : ClientResource
 
     public FahClientSlotDescription? SlotDescription { get; init; }
 
+    public override string GetName() => SlotIdentifier.Name;
+
     public override string GetResourceType(bool showVersions)
     {
         if (SlotDescription is null || SlotDescription.SlotType == FahClientSlotType.Unknown)
