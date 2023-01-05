@@ -6,22 +6,17 @@ namespace HFM.Core.Client;
 
 public class ClientResourceSortComparer : SortComparer<ClientResource>
 {
-    public bool OfflineClientsLast { get; set; }
+    public bool OfflineStatusLast { get; set; }
 
     public override bool SupportsAdvancedSorting => false;
 
     protected override int CompareInternal(ClientResource? x, ClientResource? y)
     {
-        /* Get property values */
-        var xValue = GetPropertyValue(x, Property);
-        var yValue = GetPropertyValue(y, Property);
         var xStatusValue = x!.Status;
         var yStatusValue = y!.Status;
-        var xNameValue = x.GetName();
-        var yNameValue = y.GetName();
 
-        // check for offline clients first
-        if (OfflineClientsLast)
+        // check for offline resources first
+        if (OfflineStatusLast)
         {
             if (xStatusValue == ClientResourceStatus.Offline &&
                 yStatusValue != ClientResourceStatus.Offline)
@@ -36,8 +31,9 @@ public class ClientResourceSortComparer : SortComparer<ClientResource>
         }
 
         int returnValue;
+        var xValue = GetPropertyValue(x, Property);
+        var yValue = GetPropertyValue(y, Property);
 
-        /* Determine sort order */
         if (Direction == ListSortDirection.Ascending)
         {
             returnValue = CompareAscending(xValue, yValue);
@@ -47,9 +43,11 @@ public class ClientResourceSortComparer : SortComparer<ClientResource>
             returnValue = CompareDescending(xValue, yValue);
         }
 
-        // if values are equal, sort via the client name (asc)
+        // if values are equal, sort via the name (asc)
         if (returnValue == 0)
         {
+            var xNameValue = x.Name;
+            var yNameValue = y.Name;
             returnValue = CompareAscending(xNameValue, yNameValue);
         }
 

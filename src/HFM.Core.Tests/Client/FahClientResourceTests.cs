@@ -35,7 +35,7 @@ public class FahClientResourceTests
 
             [Test]
             public void ThenResourceTypeIncludesThreads() =>
-                Assert.That(_resource!.GetResourceType(false), Is.EqualTo("CPU:12"));
+                Assert.That(_resource!.FormatResourceType(false), Is.EqualTo("CPU:12"));
         }
 
         [TestFixture]
@@ -57,11 +57,11 @@ public class FahClientResourceTests
 
             [Test]
             public void ThenResourceTypeIncludesThreads() =>
-                Assert.That(_resource!.GetResourceType(false), Is.EqualTo("CPU:12"));
+                Assert.That(_resource!.FormatResourceType(false), Is.EqualTo("CPU:12"));
 
             [Test]
             public void ThenResourceTypeIncludesClientPlatformVersion() =>
-                Assert.That(_resource!.GetResourceType(true), Is.EqualTo("CPU:12 (8.0.0)"));
+                Assert.That(_resource!.FormatResourceType(true), Is.EqualTo("CPU:12 (8.0.0)"));
         }
     }
 
@@ -93,7 +93,7 @@ public class FahClientResourceTests
 
             [Test]
             public void ThenProcessorReportsGpuSlotDescriptionProcessor() =>
-                Assert.That(_resource!.GetProcessor(false), Is.EqualTo("GeForce RTX 3080"));
+                Assert.That(_resource!.FormatProcessor(false), Is.EqualTo("GeForce RTX 3080"));
         }
 
         [TestFixture]
@@ -121,11 +121,11 @@ public class FahClientResourceTests
 
             [Test]
             public void ThenProcessorReportsGpuSlotDescriptionProcessor() =>
-                Assert.That(_resource!.GetProcessor(false), Is.EqualTo("GeForce RTX 3080"));
+                Assert.That(_resource!.FormatProcessor(false), Is.EqualTo("GeForce RTX 3080"));
 
             [Test]
             public void ThenProcessorReportsGpuSlotDescriptionProcessorAndWorkUnitPlatform() =>
-                Assert.That(_resource!.GetProcessor(true), Is.EqualTo("GeForce RTX 3080 (CUDA 831.57)"));
+                Assert.That(_resource!.FormatProcessor(true), Is.EqualTo("GeForce RTX 3080 (CUDA 831.57)"));
         }
     }
 
@@ -141,11 +141,11 @@ public class FahClientResourceTests
 
         [Test]
         public void ThenResourceTypeIsEmptyString() =>
-            Assert.That(_resource!.GetResourceType(false), Is.Empty);
+            Assert.That(_resource!.FormatResourceType(false), Is.Empty);
 
         [Test]
         public void ThenProcessorIsEmptyString() =>
-            Assert.That(_resource!.GetProcessor(false), Is.Empty);
+            Assert.That(_resource!.FormatProcessor(false), Is.Empty);
     }
 
 }

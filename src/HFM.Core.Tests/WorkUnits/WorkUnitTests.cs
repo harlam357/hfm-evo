@@ -67,28 +67,28 @@ public class WorkUnitTests
         [TestCase(PpdCalculation.AllFrames)]
         [TestCase(PpdCalculation.EffectiveRate)]
         public void ThenCalculateRawTime(PpdCalculation ppdCalculation) =>
-            Assert.That(_workUnit!.GetRawTime(ppdCalculation), Is.EqualTo(0));
+            Assert.That(_workUnit!.CalculateRawTime(ppdCalculation), Is.EqualTo(0));
 
         [TestCase(PpdCalculation.LastFrame)]
         [TestCase(PpdCalculation.LastThreeFrames)]
         [TestCase(PpdCalculation.AllFrames)]
         [TestCase(PpdCalculation.EffectiveRate)]
         public void ThenCalculateFrameTime(PpdCalculation ppdCalculation) =>
-            Assert.That(_workUnit!.GetFrameTime(ppdCalculation), Is.EqualTo(TimeSpan.FromSeconds(0)));
+            Assert.That(_workUnit!.CalculateFrameTime(ppdCalculation), Is.EqualTo(TimeSpan.FromSeconds(0)));
 
         [TestCase(PpdCalculation.LastFrame)]
         [TestCase(PpdCalculation.LastThreeFrames)]
         [TestCase(PpdCalculation.AllFrames)]
         [TestCase(PpdCalculation.EffectiveRate)]
         public void ThenCalculateCredit(PpdCalculation ppdCalculation) =>
-            Assert.That(_workUnit!.GetCredit(ppdCalculation, BonusCalculation.None), Is.EqualTo(0.0));
+            Assert.That(_workUnit!.CalculateCredit(ppdCalculation, BonusCalculation.None), Is.EqualTo(0.0));
 
         [TestCase(PpdCalculation.LastFrame)]
         [TestCase(PpdCalculation.LastThreeFrames)]
         [TestCase(PpdCalculation.AllFrames)]
         [TestCase(PpdCalculation.EffectiveRate)]
         public void ThenCalculatePpd(PpdCalculation ppdCalculation) =>
-            Assert.That(_workUnit!.GetPpd(ppdCalculation, BonusCalculation.None), Is.EqualTo(0.0));
+            Assert.That(_workUnit!.CalculatePointsPerDay(ppdCalculation, BonusCalculation.None), Is.EqualTo(0.0));
     }
 
     [TestFixture]
@@ -143,7 +143,7 @@ public class WorkUnitTests
         [TestCase(PpdCalculation.AllFrames)]
         [TestCase(PpdCalculation.EffectiveRate)]
         public void ThenCalculateRawTime(PpdCalculation ppdCalculation) =>
-            Assert.That(_workUnit!.GetRawTime(ppdCalculation), Is.EqualTo(0));
+            Assert.That(_workUnit!.CalculateRawTime(ppdCalculation), Is.EqualTo(0));
     }
 
     [TestFixture]
@@ -185,15 +185,15 @@ public class WorkUnitTests
 
             [Test]
             public void ThenCalculateRawTimeUsingEffectiveRate() =>
-                Assert.That(_workUnit!.GetRawTime(PpdCalculation.EffectiveRate), Is.EqualTo(600));
+                Assert.That(_workUnit!.CalculateRawTime(PpdCalculation.EffectiveRate), Is.EqualTo(600));
 
             [Test]
             public void ThenCalculateFrameTimeUsingEffectiveRate() =>
-                Assert.That(_workUnit!.GetFrameTime(PpdCalculation.EffectiveRate), Is.EqualTo(TimeSpan.FromSeconds(600)));
+                Assert.That(_workUnit!.CalculateFrameTime(PpdCalculation.EffectiveRate), Is.EqualTo(TimeSpan.FromSeconds(600)));
 
             [Test]
             public void ThenCalculatePpdUsingEffectiveRate() =>
-                Assert.That(_workUnit!.GetPpd(PpdCalculation.EffectiveRate, BonusCalculation.None), Is.EqualTo(144.0));
+                Assert.That(_workUnit!.CalculatePointsPerDay(PpdCalculation.EffectiveRate, BonusCalculation.None), Is.EqualTo(144.0));
         }
 
         [TestFixture]
@@ -227,35 +227,35 @@ public class WorkUnitTests
 
             [Test]
             public void ThenCalculateUpdUsingLastFrame() =>
-                Assert.That(_workUnit!.GetUpd(PpdCalculation.LastFrame), Is.EqualTo(2.4));
+                Assert.That(_workUnit!.CalculateUnitsPerDay(PpdCalculation.LastFrame), Is.EqualTo(2.4));
 
             [Test]
             public void ThenCalculateCreditUsingLastFrameAndDownloadTime() =>
-                Assert.That(_workUnit!.GetCredit(PpdCalculation.LastFrame, BonusCalculation.DownloadTime), Is.EqualTo(1897.367));
+                Assert.That(_workUnit!.CalculateCredit(PpdCalculation.LastFrame, BonusCalculation.DownloadTime), Is.EqualTo(1897.367));
 
             [Test]
             public void ThenCalculatePpdUsingLastFrameAndDownloadTime() =>
-                Assert.That(_workUnit!.GetPpd(PpdCalculation.LastFrame, BonusCalculation.DownloadTime), Is.EqualTo(4553.6808));
+                Assert.That(_workUnit!.CalculatePointsPerDay(PpdCalculation.LastFrame, BonusCalculation.DownloadTime), Is.EqualTo(4553.6808));
 
             [Test]
             public void ThenCalculateCreditUsingLastFrameAndFrameTime() =>
-                Assert.That(_workUnit!.GetCredit(PpdCalculation.LastFrame, BonusCalculation.FrameTime), Is.EqualTo(848.528));
+                Assert.That(_workUnit!.CalculateCredit(PpdCalculation.LastFrame, BonusCalculation.FrameTime), Is.EqualTo(848.528));
 
             [Test]
             public void ThenCalculatePpdUsingLastFrameAndFrameTime() =>
-                Assert.That(_workUnit!.GetPpd(PpdCalculation.LastFrame, BonusCalculation.FrameTime), Is.EqualTo(2036.4672));
+                Assert.That(_workUnit!.CalculatePointsPerDay(PpdCalculation.LastFrame, BonusCalculation.FrameTime), Is.EqualTo(2036.4672));
 
             [Test]
             public void ThenCalculateCreditUsingLastFrameAndNone() =>
-                Assert.That(_workUnit!.GetCredit(PpdCalculation.LastFrame, BonusCalculation.None), Is.EqualTo(100.0));
+                Assert.That(_workUnit!.CalculateCredit(PpdCalculation.LastFrame, BonusCalculation.None), Is.EqualTo(100.0));
 
             [Test]
             public void ThenCalculatePpdUsingLastFrameAndDownloadNone() =>
-                Assert.That(_workUnit!.GetPpd(PpdCalculation.LastFrame, BonusCalculation.None), Is.EqualTo(240.0));
+                Assert.That(_workUnit!.CalculatePointsPerDay(PpdCalculation.LastFrame, BonusCalculation.None), Is.EqualTo(240.0));
 
             [Test]
             public void ThenCalculateEtaUsingLastFrame() =>
-                Assert.That(_workUnit!.GetEta(PpdCalculation.LastFrame), Is.EqualTo(TimeSpan.FromMinutes(582)));
+                Assert.That(_workUnit!.CalculateEta(PpdCalculation.LastFrame), Is.EqualTo(TimeSpan.FromMinutes(582)));
         }
 
         [TestFixture]
@@ -289,11 +289,11 @@ public class WorkUnitTests
 
             [Test]
             public void ThenCalculateCreditUsingLastFrameAndDownloadTime() =>
-                Assert.That(_workUnit!.GetCredit(PpdCalculation.LastFrame, BonusCalculation.DownloadTime), Is.EqualTo(784.465));
+                Assert.That(_workUnit!.CalculateCredit(PpdCalculation.LastFrame, BonusCalculation.DownloadTime), Is.EqualTo(784.465));
 
             [Test]
             public void ThenCalculatePpdUsingLastFrameAndDownloadTime() =>
-                Assert.That(_workUnit!.GetPpd(PpdCalculation.LastFrame, BonusCalculation.DownloadTime), Is.EqualTo(1882.716));
+                Assert.That(_workUnit!.CalculatePointsPerDay(PpdCalculation.LastFrame, BonusCalculation.DownloadTime), Is.EqualTo(1882.716));
         }
 
         [TestFixture]
@@ -323,11 +323,11 @@ public class WorkUnitTests
 
             [Test]
             public void ThenCalculateCreditUsingLastFrameAndDownloadTime() =>
-                Assert.That(_workUnit!.GetCredit(PpdCalculation.LastFrame, BonusCalculation.DownloadTime), Is.EqualTo(100.0));
+                Assert.That(_workUnit!.CalculateCredit(PpdCalculation.LastFrame, BonusCalculation.DownloadTime), Is.EqualTo(100.0));
 
             [Test]
             public void ThenCalculatePpdUsingLastFrameAndDownloadTime() =>
-                Assert.That(_workUnit!.GetPpd(PpdCalculation.LastFrame, BonusCalculation.DownloadTime), Is.EqualTo(240.0));
+                Assert.That(_workUnit!.CalculatePointsPerDay(PpdCalculation.LastFrame, BonusCalculation.DownloadTime), Is.EqualTo(240.0));
         }
     }
 
@@ -357,43 +357,43 @@ public class WorkUnitTests
 
         [Test]
         public void ThenCalculateRawTimeUsingUnknownPpdCalculation() =>
-            Assert.That(_workUnit!.GetRawTime((PpdCalculation)Int32.MaxValue), Is.EqualTo(0));
+            Assert.That(_workUnit!.CalculateRawTime((PpdCalculation)Int32.MaxValue), Is.EqualTo(0));
 
         [Test]
         public void ThenCalculateRawTimeUsingAllFrames() =>
-            Assert.That(_workUnit!.GetRawTime(PpdCalculation.AllFrames), Is.EqualTo(360));
+            Assert.That(_workUnit!.CalculateRawTime(PpdCalculation.AllFrames), Is.EqualTo(360));
 
         [Test]
         public void ThenCalculateFrameTimeUsingAllFrames() =>
-            Assert.That(_workUnit!.GetFrameTime(PpdCalculation.AllFrames), Is.EqualTo(TimeSpan.FromSeconds(360)));
+            Assert.That(_workUnit!.CalculateFrameTime(PpdCalculation.AllFrames), Is.EqualTo(TimeSpan.FromSeconds(360)));
 
         [Test]
         public void ThenCalculatePpdUsingAllFrames() =>
-            Assert.That(_workUnit!.GetPpd(PpdCalculation.AllFrames, BonusCalculation.None), Is.EqualTo(240.0));
+            Assert.That(_workUnit!.CalculatePointsPerDay(PpdCalculation.AllFrames, BonusCalculation.None), Is.EqualTo(240.0));
 
         [Test]
         public void ThenCalculateRawTimeUsingLastThreeFrames() =>
-            Assert.That(_workUnit!.GetRawTime(PpdCalculation.LastThreeFrames), Is.EqualTo(376));
+            Assert.That(_workUnit!.CalculateRawTime(PpdCalculation.LastThreeFrames), Is.EqualTo(376));
 
         [Test]
         public void ThenCalculateFrameTimeUsingLastThreeFrames() =>
-            Assert.That(_workUnit!.GetFrameTime(PpdCalculation.LastThreeFrames), Is.EqualTo(TimeSpan.FromSeconds(376)));
+            Assert.That(_workUnit!.CalculateFrameTime(PpdCalculation.LastThreeFrames), Is.EqualTo(TimeSpan.FromSeconds(376)));
 
         [Test]
         public void ThenCalculatePpdUsingLastThreeFrames() =>
-            Assert.That(_workUnit!.GetPpd(PpdCalculation.LastThreeFrames, BonusCalculation.None), Is.EqualTo(229.78723));
+            Assert.That(_workUnit!.CalculatePointsPerDay(PpdCalculation.LastThreeFrames, BonusCalculation.None), Is.EqualTo(229.78723));
 
         [Test]
         public void ThenCalculateRawTimeUsingLastFrame() =>
-            Assert.That(_workUnit!.GetRawTime(PpdCalculation.LastFrame), Is.EqualTo(380));
+            Assert.That(_workUnit!.CalculateRawTime(PpdCalculation.LastFrame), Is.EqualTo(380));
 
         [Test]
         public void ThenCalculateFrameTimeUsingLastFrame() =>
-            Assert.That(_workUnit!.GetFrameTime(PpdCalculation.LastFrame), Is.EqualTo(TimeSpan.FromSeconds(380)));
+            Assert.That(_workUnit!.CalculateFrameTime(PpdCalculation.LastFrame), Is.EqualTo(TimeSpan.FromSeconds(380)));
 
         [Test]
         public void ThenCalculatePpdUsingLastFrame() =>
-            Assert.That(_workUnit!.GetPpd(PpdCalculation.LastFrame, BonusCalculation.None), Is.EqualTo(227.36842));
+            Assert.That(_workUnit!.CalculatePointsPerDay(PpdCalculation.LastFrame, BonusCalculation.None), Is.EqualTo(227.36842));
     }
 
     [TestFixture]

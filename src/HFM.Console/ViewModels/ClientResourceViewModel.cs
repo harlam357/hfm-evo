@@ -8,7 +8,7 @@ using HFM.Preferences;
 
 namespace HFM.Console.ViewModels;
 
-public class ClientResourceViewModel
+public class ClientResourceViewModel : IClientResourceView
 {
     private readonly ClientResource _clientResource;
     private readonly IPreferences _preferences;
@@ -26,45 +26,36 @@ public class ClientResourceViewModel
         _clientResource.CalculateProgress(PpdCalculation);
 
     public string? Name =>
-        _clientResource.GetName();
+        _clientResource.Name;
 
     public string ResourceType =>
-        _clientResource.GetResourceType(ShowVersions);
+        _clientResource.FormatResourceType(ShowVersions);
 
     public string Processor =>
-        _clientResource.GetProcessor(ShowVersions);
+        _clientResource.FormatProcessor(ShowVersions);
 
-    public TimeSpan TPF =>
-        _clientResource.GetFrameTime(PpdCalculation);
+    public TimeSpan FrameTime =>
+        _clientResource.CalculateFrameTime(PpdCalculation);
 
-    public double PPD =>
-        Math.Round(_clientResource.GetPpd(PpdCalculation, BonusCalculation), DecimalPlaces);
+    public double PointsPerDay =>
+        Math.Round(_clientResource.CalculatePointsPerDay(PpdCalculation, BonusCalculation), DecimalPlaces);
 
-    public ClientResourceEtaValue ETA
-    {
-        get
-        {
-            TimeSpan eta = _clientResource.GetEta(PpdCalculation);
-            DateTime? etaDate = EtaAsDate ? _clientResource.GetEtaDate(PpdCalculation) : null;
-            return new(eta, etaDate);
-        }
-    }
+    public ClientResourceEtaValue ETA =>
+        _clientResource.CalculateEtaValue(PpdCalculation, EtaAsDate);
 
     public string Core =>
-        _clientResource.GetCore(ShowVersions);
+        _clientResource.FormatCore(ShowVersions);
 
-    public string ProjectRunCloneGen =>
-        _clientResource.WorkUnit?.ToShortProjectString() ?? String.Empty;
+    public string ProjectRunCloneGen => _clientResource.ProjectRunCloneGen;
 
     public double Credit =>
-        Math.Round(_clientResource.GetCredit(PpdCalculation, BonusCalculation), DecimalPlaces);
+        Math.Round(_clientResource.CalculateCredit(PpdCalculation, BonusCalculation), DecimalPlaces);
 
     public int Completed { get; set; }
 
     public int Failed { get; set; }
 
-    public string DonorIdentity =>
-        _clientResource.GetIdentity();
+    public string DonorIdentity => _clientResource.DonorIdentity;
 
     public DateTime Assigned => _clientResource.WorkUnit?.Assigned.ToLocalTime() ?? default;
 
@@ -169,9 +160,9 @@ public class ClientResourceViewModel
         sb.Append(delimiter);
         sb.Append(FormatFixedWidth(Processor, 20));
         sb.Append(delimiter);
-        sb.Append(FormatFixedWidth(TPF.ToString(@"mm\:ss", CultureInfo.CurrentCulture), 5));
+        sb.Append(FormatFixedWidth(FrameTime.ToString(@"mm\:ss", CultureInfo.CurrentCulture), 5));
         sb.Append(delimiter);
-        sb.Append(FormatFixedWidth(PPD.ToString(CultureInfo.CurrentCulture), 9));
+        sb.Append(FormatFixedWidth(PointsPerDay.ToString(CultureInfo.CurrentCulture), 9));
         sb.Append(delimiter);
         sb.Append(FormatFixedWidth(ETA.ToString(CultureInfo.CurrentCulture), 8));
         sb.Append(delimiter);

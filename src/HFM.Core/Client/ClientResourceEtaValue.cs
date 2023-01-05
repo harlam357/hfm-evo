@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace HFM.Console.ViewModels;
+namespace HFM.Core.Client;
 
 public readonly struct ClientResourceEtaValue : IEquatable<ClientResourceEtaValue>, IComparable<ClientResourceEtaValue>, IComparable
 {

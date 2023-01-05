@@ -109,7 +109,7 @@ public record WorkUnit : IProjectInfo, IItemIdentifier
     }
 
     public bool ShouldUseBenchmarkFrameTime(PpdCalculation ppdCalculation) =>
-        this.HasProject() && GetRawTime(ppdCalculation) == 0;
+        this.HasProject() && CalculateRawTime(ppdCalculation) == 0;
 
     public int Progress => Protein is null ? 0 : FramesComplete * 100 / Protein.Frames;
 
@@ -122,23 +122,23 @@ public record WorkUnit : IProjectInfo, IItemIdentifier
     /// <summary>
     /// Gets the frame time for the given PPD calculation.
     /// </summary>
-    public TimeSpan GetFrameTime(PpdCalculation ppdCalculation)
+    public TimeSpan CalculateFrameTime(PpdCalculation ppdCalculation)
     {
-        int rawTime = GetRawTime(ppdCalculation);
+        int rawTime = CalculateRawTime(ppdCalculation);
         return TimeSpan.FromSeconds(rawTime);
     }
 
     /// <summary>
     /// Get the credit for the given PPD and bonus calculations.
     /// </summary>
-    public double GetCredit(PpdCalculation ppdCalculation, BonusCalculation calculateBonus)
+    public double CalculateCredit(PpdCalculation ppdCalculation, BonusCalculation calculateBonus)
     {
         if (!Protein.IsValid(Protein))
         {
             return 0.0;
         }
 
-        var frameTime = GetFrameTime(ppdCalculation);
+        var frameTime = CalculateFrameTime(ppdCalculation);
 #pragma warning disable IDE0072 // Add missing cases
         return calculateBonus switch
         {
@@ -152,20 +152,20 @@ public record WorkUnit : IProjectInfo, IItemIdentifier
     /// <summary>
     /// Gets the units per day (UPD) for the given PPD calculation.
     /// </summary>
-    public double GetUpd(PpdCalculation ppdCalculation) =>
-        Protein?.GetUPD(GetFrameTime(ppdCalculation)) ?? 0.0;
+    public double CalculateUnitsPerDay(PpdCalculation ppdCalculation) =>
+        Protein?.GetUPD(CalculateFrameTime(ppdCalculation)) ?? 0.0;
 
     /// <summary>
     /// Gets the points per day (PPD) for the given PPD and bonus calculations.
     /// </summary>
-    public double GetPpd(PpdCalculation ppdCalculation, BonusCalculation calculateBonus)
+    public double CalculatePointsPerDay(PpdCalculation ppdCalculation, BonusCalculation calculateBonus)
     {
         if (!Protein.IsValid(Protein))
         {
             return 0.0;
         }
 
-        var frameTime = GetFrameTime(ppdCalculation);
+        var frameTime = CalculateFrameTime(ppdCalculation);
 #pragma warning disable IDE0072 // Add missing cases
         return calculateBonus switch
         {
@@ -179,12 +179,12 @@ public record WorkUnit : IProjectInfo, IItemIdentifier
     /// <summary>
     /// Gets the estimated time of arrival (ETA) for the given PPD calculation.
     /// </summary>
-    public TimeSpan GetEta(PpdCalculation ppdCalculation) => GetEta(GetFrameTime(ppdCalculation));
+    public TimeSpan CalculateEta(PpdCalculation ppdCalculation) => CalculateEta(CalculateFrameTime(ppdCalculation));
 
     /// <summary>
     /// Gets the estimated time of arrival (ETA) for the given frame time.
     /// </summary>
-    private TimeSpan GetEta(TimeSpan frameTime) =>
+    private TimeSpan CalculateEta(TimeSpan frameTime) =>
         Protein is null
             ? TimeSpan.Zero
             : new TimeSpan((Protein.Frames - FramesComplete) * frameTime.Ticks);
@@ -203,7 +203,7 @@ public record WorkUnit : IProjectInfo, IItemIdentifier
             return Finished.Value.Subtract(Assigned);
         }
 
-        var eta = GetEta(frameTime);
+        var eta = CalculateEta(frameTime);
         return eta == TimeSpan.Zero && AllFramesCompleted == false
             ? TimeSpan.Zero
             : UnitRetrievalTime.Add(eta).Subtract(Assigned);
@@ -217,7 +217,7 @@ public record WorkUnit : IProjectInfo, IItemIdentifier
     /// <summary>
     /// Gets the raw frame time (in seconds) for the given PPD calculation.
     /// </summary>
-    public int GetRawTime(PpdCalculation ppdCalculation) =>
+    public int CalculateRawTime(PpdCalculation ppdCalculation) =>
         ppdCalculation switch
         {
             PpdCalculation.LastFrame => FramesObserved > 1 ? Convert.ToInt32(CurrentFrame?.Duration.TotalSeconds ?? 0.0) : 0,

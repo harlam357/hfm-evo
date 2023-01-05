@@ -7,15 +7,42 @@ namespace HFM.Core.Client;
 
 public record FahClientResource : ClientResource
 {
+    // TODO: remove FahClientResource default ctor
+    public FahClientResource()
+    {
+
+    }
+
+    public FahClientResource(PpdCalculation ppdCalculation, BonusCalculation bonusCalculation, bool showVersions, bool etaAsDate)
+        : base(ppdCalculation, bonusCalculation, showVersions, etaAsDate)
+    {
+
+    }
+
+    public ClientResourceStatus SlotStatus { get; init; }
+
     public FahClientSlotIdentifier SlotIdentifier { get; init; }
 
     public int SlotId { get; init; }
 
     public FahClientSlotDescription? SlotDescription { get; init; }
 
-    public override string GetName() => SlotIdentifier.Name;
+    private ClientResourceStatus? _status;
 
-    public override string GetResourceType(bool showVersions)
+    public override ClientResourceStatus CalculateStatus(PpdCalculation ppdCalculation) => _status ??= 
+        SlotStatus == ClientResourceStatus.Running
+            ? ShouldUseBenchmarkFrameTime(ppdCalculation)
+                ? ClientResourceStatus.RunningNoFrameTimes
+                : ClientResourceStatus.Running
+            : SlotStatus;
+
+    private bool ShouldUseBenchmarkFrameTime(PpdCalculation ppdCalculation) =>
+        WorkUnit is not null &&
+        WorkUnit.ShouldUseBenchmarkFrameTime(ppdCalculation);
+
+    public override string FormatName() => SlotIdentifier.Name;
+
+    public override string FormatResourceType(bool showVersions)
     {
         if (SlotDescription is null || SlotDescription.SlotType == FahClientSlotType.Unknown)
         {
@@ -39,7 +66,7 @@ public record FahClientResource : ClientResource
             ? cpu.CpuThreads
             : null;
 
-    public override string GetProcessor(bool showVersions)
+    public override string FormatProcessor(bool showVersions)
     {
         var processor = SlotDescription?.Processor;
         var platform = WorkUnit?.Platform;

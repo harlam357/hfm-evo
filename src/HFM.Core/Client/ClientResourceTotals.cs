@@ -45,8 +45,8 @@ public readonly record struct ClientResourceTotals
 
         foreach (var resource in collection)
         {
-            ppd += resource.GetPpd(ppdCalculation, bonusCalculation);
-            upd += resource.GetUpd(ppdCalculation);
+            ppd += resource.CalculatePointsPerDay(ppdCalculation, bonusCalculation);
+            upd += resource.CalculateUnitsPerDay(ppdCalculation);
             workUnits += resource.CompletedAndFailedWorkUnits;
 
             if (resource.Status.IsRunning())

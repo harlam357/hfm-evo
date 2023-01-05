@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.ComponentModel;
+using System.Globalization;
 using System.Reflection;
 
 using HFM.Console;
@@ -83,7 +84,21 @@ ClientScheduledTasks LoadClients(string path)
     configuration.ClientConfigurationChanged += (_, _) =>
     {
         logger.Info(ClientResourceViewModel.HeaderString());
-        foreach (var resource in configuration.SelectMany(x => x.Resources ?? new[] { ClientResource.Offline(x.Settings!) }))
+
+        var comparer = new ClientResourceSortComparer
+        {
+            OfflineStatusLast = preferences.Get<bool>(Preference.OfflineLast)
+        };
+        var property = TypeDescriptor.GetProperties(typeof(ClientResource))
+            .OfType<PropertyDescriptor>()
+            .FirstOrDefault(x => x.Name == nameof(ClientResource.ClientIdentifier));
+        comparer.SetSortProperties(property!, ListSortDirection.Ascending);
+
+        var resources = configuration
+            .SelectMany(x => x.Resources ?? new[] { ClientResource.Offline(x.Settings!) })
+            .OrderBy(x => x, comparer);
+
+        foreach (var resource in resources)
         {
             var viewModel = new ClientResourceViewModel(resource, preferences);
             logger.Info(viewModel.ToString());

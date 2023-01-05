@@ -6,17 +6,20 @@ using HFM.Core.Internal;
 using HFM.Core.Logging;
 using HFM.Core.WorkUnits;
 using HFM.Log;
+using HFM.Preferences;
 
 namespace HFM.Core.Client;
 
 public class FahClient : Client
 {
     private readonly ILogger _logger;
+    private readonly IPreferences _preferences;
     private readonly IProteinService _proteinService;
 
-    public FahClient(ILogger? logger, IProteinService proteinService)
+    public FahClient(ILogger? logger, IPreferences preferences, IProteinService proteinService)
     {
         _logger = logger ?? NullLogger.Instance;
+        _preferences = preferences;
         _proteinService = proteinService;
     }
 
@@ -104,7 +107,12 @@ public class FahClient : Client
 
         var resources = new List<FahClientResource>();
 
+        var ppdCalculation = _preferences.Get<PpdCalculation>(Preference.PPDCalculation);
+        var bonusCalculation = _preferences.Get<BonusCalculation>(Preference.BonusCalculation);
+        var showVersions = _preferences.Get<bool>(Preference.DisplayVersions);
+        var etaAsDate = _preferences.Get<bool>(Preference.DisplayEtaAsDate);
         var clientIdentifier = ClientIdentifier;
+
         var workUnitCollectionBuilder = new FahClientWorkUnitCollectionBuilder(messages, _proteinService);
         foreach (var slot in messages.SlotCollection.Where(x => x.ID.HasValue))
         {
@@ -118,19 +126,19 @@ public class FahClient : Client
             var previousWorkUnit = Resources?.Cast<FahClientResource>().FirstOrDefault(x => x.SlotId == slotId)?.WorkUnit;
             var workUnits = await workUnitCollectionBuilder.BuildForSlot(slotId, slotDescription, previousWorkUnit).ConfigureAwait(false);
             var currentWorkUnit = workUnits.Current;
-            var status = (ClientResourceStatus)Enum.Parse(typeof(ClientResourceStatus), slot.Status, true);
+            var slotStatus = (ClientResourceStatus)Enum.Parse(typeof(ClientResourceStatus), slot.Status, true);
 
-            resources.Add(new FahClientResource
+            resources.Add(new(ppdCalculation, bonusCalculation, showVersions, etaAsDate)
             {
                 // FahClient
-                SlotIdentifier = new FahClientSlotIdentifier(clientIdentifier, slotId),
+                SlotIdentifier = new(clientIdentifier, slotId),
                 SlotId = slotId,
                 SlotDescription = slotDescription,
                 // Client
                 ClientIdentifier = clientIdentifier,
-                Status = status,
+                SlotStatus = slotStatus,
                 // TODO: query work unit database for completed and failed values
-                CompletedAndFailedWorkUnits = new CompletedAndFailedWorkUnits(),
+                CompletedAndFailedWorkUnits = new(),
                 WorkUnit = currentWorkUnit,
                 LogLines = EnumerateLogLines(messages.ClientRun, slotId, workUnits.Current),
                 Platform = messages.Info is null ? null : new ClientPlatform(messages.Info.Client.Version, messages.Info.System.OS)
