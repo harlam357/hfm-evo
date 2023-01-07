@@ -10,11 +10,47 @@ public class ClientResourceTests
     private ClientResource? _resource;
 
     [TestFixture]
+    public class GivenClientResourceHasDefaultStatus : ClientResourceTests
+    {
+        [SetUp]
+        public virtual void BeforeEach() =>
+            _resource = new()
+            {
+                Status = default
+            };
+
+        [Test]
+        public void ThenDefaultPropertyValuesAre() =>
+            Assert.Multiple(() =>
+            {
+                Assert.That(_resource!.ClientIdentifier, Is.EqualTo(default(ClientIdentifier)));
+                Assert.That(_resource!.CompletedAndFailedWorkUnits, Is.EqualTo(default(CompletedAndFailedWorkUnits)));
+                Assert.That(_resource!.WorkUnit, Is.Null);
+                Assert.That(_resource!.LogLines, Is.Null);
+                Assert.That(_resource!.Platform, Is.Null);
+                Assert.That(_resource!.Status, Is.EqualTo(default(ClientResourceStatus)));
+                Assert.That(_resource!.Progress, Is.EqualTo(0));
+                Assert.That(_resource!.Name, Is.Null);
+                Assert.That(_resource!.ResourceType, Is.Empty);
+                Assert.That(_resource!.Processor, Is.Empty);
+                Assert.That(_resource!.FrameTime, Is.EqualTo(TimeSpan.Zero));
+                Assert.That(_resource!.PointsPerDay, Is.EqualTo(0.0));
+                Assert.That(_resource!.ETA, Is.EqualTo(default(ClientResourceEtaValue)));
+                Assert.That(_resource!.Core, Is.Empty);
+                Assert.That(_resource!.ProjectRunCloneGen, Is.Empty);
+                Assert.That(_resource!.Credit, Is.EqualTo(0.0));
+                Assert.That(_resource!.DonorIdentity, Is.Empty);
+                Assert.That(_resource!.Assigned, Is.EqualTo(default(DateTime)));
+                Assert.That(_resource!.Timeout, Is.EqualTo(default(DateTime)));
+            });
+    }
+
+    [TestFixture]
     public class GivenClientResourceHasRunningStatus : ClientResourceTests
     {
         [SetUp]
         public virtual void BeforeEach() =>
-            _resource = new ClientResource
+            _resource = new()
             {
                 Status = ClientResourceStatus.Running
             };
@@ -71,9 +107,9 @@ public class ClientResourceTests
                 base.BeforeEach();
                 _resource = _resource! with
                 {
-                    WorkUnit = new WorkUnit
+                    WorkUnit = new()
                     {
-                        Protein = new Protein
+                        Protein = new()
                         {
                             ProjectNumber = 1,
                             PreferredDays = 2,
@@ -129,7 +165,7 @@ public class ClientResourceTests
     {
         [SetUp]
         public virtual void BeforeEach() =>
-            _resource = new ClientResource
+            _resource = new()
             {
                 Status = ClientResourceStatus.Paused
             };
@@ -143,9 +179,9 @@ public class ClientResourceTests
                 base.BeforeEach();
                 _resource = _resource! with
                 {
-                    WorkUnit = new WorkUnit
+                    WorkUnit = new()
                     {
-                        Protein = new Protein
+                        Protein = new()
                         {
                             ProjectNumber = 1,
                             PreferredDays = 2,
@@ -201,11 +237,11 @@ public class ClientResourceTests
     {
         [SetUp]
         public virtual void BeforeEach() =>
-            _resource = new ClientResource
+            _resource = new()
             {
-                WorkUnit = new WorkUnit
+                WorkUnit = new()
                 {
-                    Protein = new Protein
+                    Protein = new()
                     {
                         ProjectNumber = 1,
                         PreferredDays = 2,
@@ -215,7 +251,7 @@ public class ClientResourceTests
                         KFactor = 0.75,
                         Core = "0x22"
                     },
-                    CoreVersion = new Version(0, 0, 20)
+                    CoreVersion = new(0, 0, 20)
                 }
             };
 

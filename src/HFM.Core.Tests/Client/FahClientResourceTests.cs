@@ -8,11 +8,26 @@ public class FahClientResourceTests
     private FahClientResource? _resource;
 
     [TestFixture]
+    public class GivenFahClientResourceHasSlotIdentifier : FahClientResourceTests
+    {
+        [SetUp]
+        public virtual void BeforeEach() =>
+            _resource = new()
+            {
+                SlotIdentifier = new(new("Foo", "Bar", ClientSettings.DefaultPort, Guid.NewGuid()), 1)
+            };
+
+        [Test]
+        public void ThenNameIncludesSlotId() =>
+            Assert.That(_resource!.FormatName(), Is.EqualTo("Foo Slot 01"));
+    }
+
+    [TestFixture]
     public class GivenFahClientResourceHasCpuSlotDescription : FahClientResourceTests
     {
         [SetUp]
         public virtual void BeforeEach() =>
-            _resource = new FahClientResource
+            _resource = new()
             {
                 SlotDescription = new FahClientCpuSlotDescription()
             };
@@ -51,7 +66,7 @@ public class FahClientResourceTests
                     {
                         CpuThreads = 12
                     },
-                    Platform = new ClientPlatform("8.0.0", "Linux")
+                    Platform = new("8.0.0", "Linux")
                 };
             }
 
@@ -70,7 +85,7 @@ public class FahClientResourceTests
     {
         [SetUp]
         public virtual void BeforeEach() =>
-            _resource = new FahClientResource
+            _resource = new()
             {
                 SlotDescription = new FahClientGpuSlotDescription()
             };
@@ -109,9 +124,9 @@ public class FahClientResourceTests
                     {
                         Processor = "GeForce RTX 3080"
                     },
-                    WorkUnit = new WorkUnit
+                    WorkUnit = new()
                     {
-                        Platform = new WorkUnitPlatform(WorkUnitPlatformImplementation.CUDA)
+                        Platform = new(WorkUnitPlatformImplementation.CUDA)
                         {
                             DriverVersion = "831.57"
                         }
@@ -134,7 +149,7 @@ public class FahClientResourceTests
     {
         [SetUp]
         public virtual void BeforeEach() =>
-            _resource = new FahClientResource
+            _resource = new()
             {
                 SlotDescription = null
             };
