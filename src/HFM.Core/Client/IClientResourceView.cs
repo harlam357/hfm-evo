@@ -9,7 +9,7 @@ public interface IClientResourceView
     string Processor { get; }
     TimeSpan FrameTime { get; }
     double PointsPerDay { get; }
-    ClientResourceEtaValue ETA { get; }
+    string ETA { get; }
     string Core { get; }
     string ProjectRunCloneGen { get; }
     double Credit { get; }

@@ -5,7 +5,7 @@ using HFM.Log;
 
 namespace HFM.Core.Client;
 
-public record ClientResource : IClientResourceView
+public record ClientResource
 {
     private readonly PpdCalculation _ppdCalculation;
     private readonly BonusCalculation _bonusCalculation;

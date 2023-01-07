@@ -40,8 +40,18 @@ public class ClientResourceViewModel : IClientResourceView
     public double PointsPerDay =>
         Math.Round(_clientResource.CalculatePointsPerDay(PpdCalculation, BonusCalculation), DecimalPlaces);
 
-    public ClientResourceEtaValue ETA =>
-        _clientResource.CalculateEtaValue(PpdCalculation, EtaAsDate);
+    public string ETA
+    {
+        get
+        {
+            var etaValue = _clientResource.CalculateEtaValue(PpdCalculation, EtaAsDate);
+            return etaValue.EtaDate.HasValue
+                ? etaValue.EtaDate == DateTime.MinValue
+                    ? String.Empty
+                    : etaValue.EtaDate.Value.ToLocalTime().ToString(CultureInfo.CurrentCulture)
+                : etaValue.Eta.ToString();
+        }
+    }
 
     public string Core =>
         _clientResource.FormatCore(ShowVersions);

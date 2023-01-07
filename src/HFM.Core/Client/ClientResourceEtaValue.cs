@@ -10,15 +10,30 @@ public readonly struct ClientResourceEtaValue : IEquatable<ClientResourceEtaValu
 
     public ClientResourceEtaValue(TimeSpan eta, DateTime? etaDate)
     {
+        ValidateEtaDate(etaDate);
+
         Eta = eta;
         EtaDate = etaDate;
     }
 
-    public override string ToString() =>
-        EtaDate.HasValue ? EtaDate.Value.ToLocalTime().ToString(CultureInfo.CurrentCulture) : Eta.ToString();
+    private static void ValidateEtaDate(DateTime? etaDate)
+    {
+        if (etaDate is null || etaDate.Value == DateTime.MinValue)
+        {
+            return;
+        }
+        if (etaDate.Value.Kind != DateTimeKind.Utc)
+        {
+            throw new ArgumentException($"{nameof(etaDate)} must be DateTimeKind.Utc", nameof(etaDate));
+        }
+    }
+
+    public override string ToString() => ToString(CultureInfo.CurrentCulture);
 
     public string ToString(IFormatProvider? formatProvider) =>
-        EtaDate.HasValue ? EtaDate.Value.ToLocalTime().ToString(formatProvider) : Eta.ToString();
+        EtaDate.HasValue
+            ? EtaDate.Value.ToString(formatProvider)
+            : Eta.ToString();
 
     public bool Equals(ClientResourceEtaValue other) => Eta.Equals(other.Eta);
 

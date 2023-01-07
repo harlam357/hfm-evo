@@ -151,13 +151,13 @@ public class ClientResourceEtaValueTests
 
 #pragma warning disable CA1305
             [Test]
-            public void ThenToStringReturnsLocalDateTimeString() =>
-                Assert.That(_value.ToString(), Is.EqualTo("1/7/2023 6:01:00 AM"));
+            public void ThenToStringReturnsDateTimeString() =>
+                Assert.That(_value.ToString(), Is.EqualTo("1/7/2023 12:01:00 PM"));
 #pragma warning restore CA1305
 
             [Test]
-            public void ThenToStringWithFormatReturnsLocalDateTimeString() =>
-                Assert.That(_value.ToString(CultureInfo.InvariantCulture), Is.EqualTo("01/07/2023 06:01:00"));
+            public void ThenToStringWithFormatReturnsDateTimeString() =>
+                Assert.That(_value.ToString(CultureInfo.InvariantCulture), Is.EqualTo("01/07/2023 12:01:00"));
         }
     }
 }
