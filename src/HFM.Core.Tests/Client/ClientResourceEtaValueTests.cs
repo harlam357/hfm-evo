@@ -9,6 +9,14 @@ namespace HFM.Core.Client;
 public class ClientResourceEtaValueTests
 {
     [TestFixture]
+    public class WhenEtaDateIsNotKindUtc : ClientResourceEtaValueTests
+    {
+        [Test]
+        public void ThenItThrowsArgumentException() =>
+            Assert.Throws<ArgumentException>(() => _ = new ClientResourceEtaValue(TimeSpan.Zero, DateTime.Now));
+    }
+
+    [TestFixture]
     public class GivenTwoClientResourceEtaValues : ClientResourceEtaValueTests
     {
         private ClientResourceEtaValue _x;
