@@ -1,6 +1,4 @@
-﻿using System.Net.Http.Headers;
-
-using HFM.Preferences;
+﻿using HFM.Preferences;
 using HFM.Proteins;
 
 namespace HFM.Core.WorkUnits;
@@ -12,24 +10,31 @@ public interface IProjectSummaryService
 
 public class ProjectSummaryService : IProjectSummaryService
 {
-    private static readonly HttpClient _HttpClient = new();
+    private static HttpClient? _HttpClient;
 
     private readonly IPreferences _preferences;
 
     public ProjectSummaryService(IPreferences preferences)
     {
-        _preferences = preferences;
+        _HttpClient ??= CreateHttpClient();
 
-        _HttpClient.DefaultRequestHeaders.CacheControl = new CacheControlHeaderValue
+        _preferences = preferences;
+    }
+
+    private static HttpClient CreateHttpClient()
+    {
+        var httpClient = new HttpClient();
+        httpClient.DefaultRequestHeaders.CacheControl = new()
         {
             NoCache = true
         };
+        return httpClient;
     }
 
     public async Task<ICollection<Protein>?> GetProteins()
     {
         var requestUri = new Uri(_preferences.Get<string>(Preference.ProjectDownloadUrl)!);
-        var response = await _HttpClient.GetAsync(requestUri).ConfigureAwait(false);
+        var response = await _HttpClient!.GetAsync(requestUri).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
 
         var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
