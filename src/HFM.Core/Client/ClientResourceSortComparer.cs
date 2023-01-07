@@ -8,6 +8,7 @@ public class ClientResourceSortComparer : SortComparer<ClientResource>
 {
     public bool OfflineStatusLast { get; set; }
 
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public override bool SupportsAdvancedSorting => false;
 
     protected override int CompareInternal(ClientResource? x, ClientResource? y)
@@ -30,25 +31,17 @@ public class ClientResourceSortComparer : SortComparer<ClientResource>
             }
         }
 
-        int returnValue;
         var xValue = GetPropertyValue(x, Property);
         var yValue = GetPropertyValue(y, Property);
 
-        if (Direction == ListSortDirection.Ascending)
-        {
-            returnValue = CompareAscending(xValue, yValue);
-        }
-        else
-        {
-            returnValue = CompareDescending(xValue, yValue);
-        }
+        int returnValue = Direction == ListSortDirection.Ascending
+            ? CompareAscending(xValue, yValue)
+            : CompareDescending(xValue, yValue);
 
         // if values are equal, sort via the name (asc)
         if (returnValue == 0)
         {
-            var xNameValue = x.Name;
-            var yNameValue = y.Name;
-            returnValue = CompareAscending(xNameValue, yNameValue);
+            returnValue = CompareAscending(x.Name, y.Name);
         }
 
         return returnValue;
