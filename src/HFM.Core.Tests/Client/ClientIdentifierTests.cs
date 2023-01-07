@@ -19,8 +19,8 @@ public class ClientIdentifierTests
             public void BeforeEach()
             {
                 var guid = Guid.NewGuid();
-                _x = new ClientIdentifier("Foo", "Bar", ClientSettings.DefaultPort, guid);
-                _y = new ClientIdentifier("Fizz", "Bizz", 46330, guid);
+                _x = new("Foo", "Bar", ClientSettings.DefaultPort, guid);
+                _y = new("Fizz", "Bizz", 46330, guid);
             }
 
             [Test]
@@ -72,9 +72,9 @@ public class ClientIdentifierTests
             public void BeforeEach()
             {
                 var guid = new Guid(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-                _x = new ClientIdentifier("Foo", "Bar", ClientSettings.DefaultPort, guid);
-                guid = new Guid(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1);
-                _y = new ClientIdentifier("Foo", "Bar", ClientSettings.DefaultPort, guid);
+                _x = new("Foo", "Bar", ClientSettings.DefaultPort, guid);
+                guid = new(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1);
+                _y = new("Foo", "Bar", ClientSettings.DefaultPort, guid);
             }
 
             [Test]
@@ -125,8 +125,8 @@ public class ClientIdentifierTests
             [SetUp]
             public void BeforeEach()
             {
-                _x = new ClientIdentifier(null, null, ClientSettings.NoPort, Guid.NewGuid());
-                _y = new ClientIdentifier(null, null, ClientSettings.NoPort, Guid.Empty);
+                _x = new(null, null, ClientSettings.NoPort, Guid.NewGuid());
+                _y = new(null, null, ClientSettings.NoPort, Guid.Empty);
             }
 
             [Test]
@@ -145,8 +145,8 @@ public class ClientIdentifierTests
             [SetUp]
             public void BeforeEach()
             {
-                _x = new ClientIdentifier(null, null, ClientSettings.NoPort, Guid.Empty);
-                _y = new ClientIdentifier(null, null, ClientSettings.NoPort, Guid.NewGuid());
+                _x = new(null, null, ClientSettings.NoPort, Guid.Empty);
+                _y = new(null, null, ClientSettings.NoPort, Guid.NewGuid());
             }
 
             [Test]
@@ -165,8 +165,8 @@ public class ClientIdentifierTests
             [SetUp]
             public void BeforeEach()
             {
-                _x = new ClientIdentifier("Foo", "Bar", ClientSettings.DefaultPort, Guid.Empty);
-                _y = new ClientIdentifier("Foo", "Bar", ClientSettings.DefaultPort, Guid.Empty);
+                _x = new("Foo", "Bar", ClientSettings.DefaultPort, Guid.Empty);
+                _y = new("Foo", "Bar", ClientSettings.DefaultPort, Guid.Empty);
             }
 
             [Test]
@@ -217,8 +217,8 @@ public class ClientIdentifierTests
             [SetUp]
             public void BeforeEach()
             {
-                _x = new ClientIdentifier("Foo", "Bar", ClientSettings.DefaultPort, Guid.Empty);
-                _y = new ClientIdentifier("Fizz", "Bizz", 46330, Guid.Empty);
+                _x = new("Foo", "Bar", ClientSettings.DefaultPort, Guid.Empty);
+                _y = new("Fizz", "Bizz", 46330, Guid.Empty);
             }
 
             [Test]
@@ -269,8 +269,8 @@ public class ClientIdentifierTests
             [Test]
             public void NameComparisonHasFirstPrecedence()
             {
-                _x = new ClientIdentifier("Foo", "Bar", ClientSettings.DefaultPort, Guid.Empty);
-                _y = new ClientIdentifier("Fizz", "Bizz", 46330, Guid.Empty);
+                _x = new("Foo", "Bar", ClientSettings.DefaultPort, Guid.Empty);
+                _y = new("Fizz", "Bizz", 46330, Guid.Empty);
 
                 Assert.That(String.Compare(_x.Name, _y.Name, StringComparison.Ordinal), Is.EqualTo(_x.CompareTo(_y)));
             }
@@ -278,8 +278,8 @@ public class ClientIdentifierTests
             [Test]
             public void ServerComparisonHasSecondPrecedence()
             {
-                _x = new ClientIdentifier("Foo", "Bar", ClientSettings.DefaultPort, Guid.Empty);
-                _y = new ClientIdentifier("Foo", "Bizz", 46330, Guid.Empty);
+                _x = new("Foo", "Bar", ClientSettings.DefaultPort, Guid.Empty);
+                _y = new("Foo", "Bizz", 46330, Guid.Empty);
 
                 Assert.That(String.Compare(_x.Server, _y.Server, StringComparison.Ordinal), Is.EqualTo(_x.CompareTo(_y)));
             }
@@ -287,8 +287,8 @@ public class ClientIdentifierTests
             [Test]
             public void PortComparisonHasThirdPrecedence()
             {
-                _x = new ClientIdentifier("Foo", "Bar", ClientSettings.DefaultPort, Guid.Empty);
-                _y = new ClientIdentifier("Foo", "Bar", 46330, Guid.Empty);
+                _x = new("Foo", "Bar", ClientSettings.DefaultPort, Guid.Empty);
+                _y = new("Foo", "Bar", 46330, Guid.Empty);
 
                 Assert.That(_x.Port.CompareTo(_y.Port), Is.EqualTo(_x.CompareTo(_y)));
             }
@@ -296,7 +296,7 @@ public class ClientIdentifierTests
     }
 
     [TestFixture]
-    public class GivenOneClientIdentifier
+    public class GivenOneClientIdentifier : ClientIdentifierTests
     {
         private ClientIdentifier _identifier;
 
