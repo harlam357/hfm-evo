@@ -29,8 +29,8 @@ public record FahClientResource : ClientResource
 
     private ClientResourceStatus? _status;
 
-    public override ClientResourceStatus CalculateStatus(PpdCalculation ppdCalculation) => _status ??= 
-        SlotStatus == ClientResourceStatus.Running
+    public override ClientResourceStatus CalculateStatus(PpdCalculation ppdCalculation) =>
+        _status ??= SlotStatus == ClientResourceStatus.Running
             ? ShouldUseBenchmarkFrameTime(ppdCalculation)
                 ? ClientResourceStatus.RunningNoFrameTimes
                 : ClientResourceStatus.Running

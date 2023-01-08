@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-
-namespace HFM.Core.Client;
+﻿namespace HFM.Core.Client;
 
 #pragma warning disable NUnit2010
 #pragma warning disable NUnit2043
@@ -139,15 +137,9 @@ public class ClientResourceEtaValueTests
             public virtual void BeforeEach() =>
                 _value = new(TimeSpan.FromMinutes(1), null);
 
-#pragma warning disable CA1305
             [Test]
             public void ThenToStringReturnsTimeSpanString() =>
                 Assert.That(_value.ToString(), Is.EqualTo("00:01:00"));
-#pragma warning restore CA1305
-
-            [Test]
-            public void ThenToStringWithFormatReturnsTimeSpanString() =>
-                Assert.That(_value.ToString(CultureInfo.InvariantCulture), Is.EqualTo("00:01:00"));
         }
 
         [TestFixture]
@@ -157,15 +149,9 @@ public class ClientResourceEtaValueTests
             public virtual void BeforeEach() =>
                 _value = new(TimeSpan.FromMinutes(1), new DateTime(2023, 1, 7, 12, 1, 0, DateTimeKind.Utc));
 
-#pragma warning disable CA1305
             [Test]
             public void ThenToStringReturnsDateTimeString() =>
-                Assert.That(_value.ToString(), Is.EqualTo("1/7/2023 12:01:00 PM"));
-#pragma warning restore CA1305
-
-            [Test]
-            public void ThenToStringWithFormatReturnsDateTimeString() =>
-                Assert.That(_value.ToString(CultureInfo.InvariantCulture), Is.EqualTo("01/07/2023 12:01:00"));
+                Assert.That(_value.ToString(), Is.EqualTo("1/7/2023 12:01 PM"));
         }
     }
 }

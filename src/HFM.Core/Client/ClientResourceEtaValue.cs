@@ -1,5 +1,7 @@
 ﻿using System.Globalization;
 
+using HFM.Core.Internal;
+
 namespace HFM.Core.Client;
 
 public readonly struct ClientResourceEtaValue : IEquatable<ClientResourceEtaValue>, IComparable<ClientResourceEtaValue>, IComparable
@@ -28,11 +30,15 @@ public readonly struct ClientResourceEtaValue : IEquatable<ClientResourceEtaValu
         }
     }
 
-    public override string ToString() => ToString(CultureInfo.CurrentCulture);
-
-    public string ToString(IFormatProvider? formatProvider) =>
+    public override string ToString() =>
         EtaDate.HasValue
-            ? EtaDate.Value.ToString(formatProvider)
+            ? EtaDate.Value.ToShortStringOrEmpty()
+            : Eta.ToString();
+
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    public string ToLocalString() =>
+        EtaDate.HasValue
+            ? EtaDate.Value.ToLocalTime().ToShortStringOrEmpty()
             : Eta.ToString();
 
     public bool Equals(ClientResourceEtaValue other) => Eta.Equals(other.Eta);

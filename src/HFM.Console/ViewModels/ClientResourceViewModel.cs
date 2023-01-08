@@ -6,8 +6,6 @@ using HFM.Core.WorkUnits;
 using HFM.Log;
 using HFM.Preferences;
 
-using static HFM.Core.Internal.DateTimeExtensions;
-
 namespace HFM.Console.ViewModels;
 
 public class ClientResourceViewModel : IClientResourceView
@@ -42,16 +40,8 @@ public class ClientResourceViewModel : IClientResourceView
     public double PointsPerDay =>
         Math.Round(_clientResource.CalculatePointsPerDay(PpdCalculation, BonusCalculation), DecimalPlaces);
 
-    public string ETA
-    {
-        get
-        {
-            var etaValue = _clientResource.CalculateEtaValue(PpdCalculation, EtaAsDate);
-            return etaValue.EtaDate.HasValue
-                ? etaValue.EtaDate.Value.ToLocalTime().ToShortStringOrEmpty()
-                : etaValue.Eta.ToString();
-        }
-    }
+    public string ETA =>
+        _clientResource.CalculateEtaValue(PpdCalculation, EtaAsDate).ToLocalString();
 
     public string Core =>
         _clientResource.FormatCore(ShowVersions);
