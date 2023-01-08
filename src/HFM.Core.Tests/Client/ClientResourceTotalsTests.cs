@@ -11,7 +11,7 @@ public class ClientResourceTotalsTests
         [Test]
         public void ReturnsDefaultTotals()
         {
-            var totals = ClientResourceTotals.Sum(null, default, default);
+            var totals = ClientResourceTotals.Sum(null);
             Assert.That(totals, Is.EqualTo(default(ClientResourceTotals)));
         }
     }
@@ -100,7 +100,7 @@ public class ClientResourceTotalsTests
         [Test]
         public void ReturnsSummedTotals()
         {
-            var totals = ClientResourceTotals.Sum(_resources, default, default);
+            var totals = ClientResourceTotals.Sum(_resources);
             Assert.Multiple(() =>
             {
                 Assert.That(totals.PPD, Is.EqualTo(15249.696));

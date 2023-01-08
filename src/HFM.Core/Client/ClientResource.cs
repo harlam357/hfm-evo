@@ -70,6 +70,10 @@ public record ClientResource
 
     public double PointsPerDay => _pointsPerDay ??= CalculatePointsPerDay(_ppdCalculation, _bonusCalculation);
 
+    private double? _unitsPerDay;
+
+    public double UnitsPerDay => _unitsPerDay ??= CalculateUnitsPerDay(_ppdCalculation);
+
     private ClientResourceEtaValue? _etaValue;
 
     public ClientResourceEtaValue ETA => _etaValue ??= CalculateEtaValue(_ppdCalculation, _etaAsDate);

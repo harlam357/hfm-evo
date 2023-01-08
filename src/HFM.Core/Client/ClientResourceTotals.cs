@@ -31,7 +31,7 @@ public readonly record struct ClientResourceTotals
     /// <summary>
     /// Gets the aggregate production values for all client resources.
     /// </summary>
-    public static ClientResourceTotals Sum(ICollection<ClientResource>? collection, PpdCalculation ppdCalculation, BonusCalculation bonusCalculation)
+    public static ClientResourceTotals Sum(ICollection<ClientResource>? collection)
     {
         if (collection is null)
         {
@@ -45,8 +45,8 @@ public readonly record struct ClientResourceTotals
 
         foreach (var resource in collection)
         {
-            ppd += resource.CalculatePointsPerDay(ppdCalculation, bonusCalculation);
-            upd += resource.CalculateUnitsPerDay(ppdCalculation);
+            ppd += resource.PointsPerDay;
+            upd += resource.UnitsPerDay;
             workUnits += resource.CompletedAndFailedWorkUnits;
 
             if (resource.Status.IsRunning())
@@ -55,7 +55,7 @@ public readonly record struct ClientResourceTotals
             }
         }
 
-        return new ClientResourceTotals
+        return new()
         {
             PPD = ppd,
             UPD = upd,
