@@ -6,6 +6,8 @@ using HFM.Core.WorkUnits;
 using HFM.Log;
 using HFM.Preferences;
 
+using static HFM.Core.Internal.DateTimeExtensions;
+
 namespace HFM.Console.ViewModels;
 
 public class ClientResourceViewModel : IClientResourceView
@@ -46,9 +48,7 @@ public class ClientResourceViewModel : IClientResourceView
         {
             var etaValue = _clientResource.CalculateEtaValue(PpdCalculation, EtaAsDate);
             return etaValue.EtaDate.HasValue
-                ? etaValue.EtaDate == DateTime.MinValue
-                    ? String.Empty
-                    : etaValue.EtaDate.Value.ToLocalTime().ToString(CultureInfo.CurrentCulture)
+                ? etaValue.EtaDate.Value.ToLocalTime().ToShortStringOrEmpty()
                 : etaValue.Eta.ToString();
         }
     }
@@ -174,7 +174,7 @@ public class ClientResourceViewModel : IClientResourceView
         sb.Append(delimiter);
         sb.Append(FormatFixedWidth(PointsPerDay.ToString(CultureInfo.CurrentCulture), 9));
         sb.Append(delimiter);
-        sb.Append(FormatFixedWidth(ETA.ToString(CultureInfo.CurrentCulture), 8));
+        sb.Append(FormatFixedWidth(ETA, 8));
         sb.Append(delimiter);
         sb.Append(FormatFixedWidth(Core, 13));
         sb.Append(delimiter);

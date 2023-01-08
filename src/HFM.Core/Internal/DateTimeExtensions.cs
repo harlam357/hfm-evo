@@ -1,8 +1,9 @@
 ﻿namespace HFM.Core.Internal;
 
-internal static class DateTimeExtensions
+[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+public static class DateTimeExtensions
 {
-    internal static string ToShortStringOrEmpty(this DateTime dateTime) =>
+    public static string ToShortStringOrEmpty(this DateTime dateTime) =>
         ToStringOrEmpty(dateTime, $"{dateTime.ToShortDateString()} {dateTime.ToShortTimeString()}");
 
     private static string ToStringOrEmpty(this IEquatable<DateTime> date, string formattedValue) =>
