@@ -80,6 +80,10 @@ public partial class InMemoryPreferencesProviderTests
             Assert.That(_preferences!.Get<string>(Preference.CacheFolder), Is.EqualTo("logcache"));
 
         [Test]
+        public void StaticStringValue() =>
+            Assert.That(_preferences!.Get<string>(Preference.CssFolderName), Is.EqualTo("CSS"));
+
+        [Test]
         public void ReferenceTypeItIsNewInstance()
         {
             var task1 = _preferences!.Get<ClientRetrievalTask>(Preference.ClientRetrievalTask);

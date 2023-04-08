@@ -14,6 +14,10 @@ public partial class InMemoryPreferencesProviderTests
         [Test]
         public void ItThrowsOnReadOnlyPreference() =>
             Assert.That(() => _preferences!.Set(Preference.ApplicationPath, "A"), Throws.InvalidOperationException);
+
+        [Test]
+        public void ItThrowsOnStaticPreference() =>
+            Assert.That(() => _preferences!.Set(Preference.CssFolderName, "A"), Throws.InvalidOperationException);
     }
 
     [TestFixture]

@@ -199,6 +199,8 @@ public abstract class PreferencesProvider : IPreferences
         d.Add(Preference.HistoryFormColumns, p => p.HistoryWindowGrid.Columns);
 
         d.AddReadOnly(Preference.CacheFolder, p => p.ApplicationSettings.CacheFolder);
+        d.AddStatic(Preference.CssFolderName, "CSS");
+        d.AddStatic(Preference.XsltFolderName, "XSL");
 
         return d;
     }
@@ -343,6 +345,9 @@ public abstract class PreferencesProvider : IPreferences
 
         public void AddEncrypted(Preference key, Expression<Func<PreferenceData, string?>> propertyExpression) =>
             _inner.Add(key, new EncryptedExpressionMetadata(Data, propertyExpression));
+
+        public void AddStatic<T>(Preference key, T? data) =>
+            _inner.Add(key, new StaticMetadata<T>(data));
 
         public IMetadata this[Preference key] => _inner[key];
     }

@@ -94,7 +94,9 @@ public enum Preference
     ApplicationDataFolderPath,
     ApplicationVersion,
     CacheDirectory,
-    HideInactiveSlots
+    HideInactiveSlots,
+    CssFolderName,
+    XsltFolderName
 }
 
 // ReSharper restore InconsistentNaming

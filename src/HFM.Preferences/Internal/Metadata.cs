@@ -23,6 +23,31 @@ internal interface IMetadata<T> : IMetadata
     new T? Data { get; set; }
 }
 
+internal sealed class StaticMetadata<T> : IMetadata<T>
+{
+    public StaticMetadata(T? data)
+    {
+        _data = data;
+    }
+
+    public Type DataType => typeof(T);
+
+    object? IMetadata.Data
+    {
+        get => Data;
+        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+        set => Data = (T?)value;
+    }
+
+    private readonly T? _data;
+
+    public T? Data
+    {
+        get => _data;
+        set => throw new InvalidOperationException("Preference is read-only.");
+    }
+}
+
 internal class ExpressionMetadata<T> : IMetadata<T>
 {
     private readonly PreferenceData _data;
