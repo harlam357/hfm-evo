@@ -1,9 +1,5 @@
-﻿using System.Runtime.Serialization;
-using System.Xml;
+﻿namespace HFM.Core.Serializers;
 
-namespace HFM.Core.Serializers;
-
-[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 public class DataContractFileSerializer<T> : IFileSerializer<T> where T : class, new()
 {
     public string FileExtension => "xml";
@@ -13,15 +9,14 @@ public class DataContractFileSerializer<T> : IFileSerializer<T> where T : class,
     public T? Deserialize(string path)
     {
         using var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read);
-        var serializer = new DataContractSerializer(typeof(T));
-        return (T?)serializer.ReadObject(fileStream);
+        var serializer = new DataContractSerializer<T>();
+        return serializer.Deserialize(fileStream);
     }
 
     public void Serialize(string path, T? value)
     {
         using var fileStream = new FileStream(path, FileMode.Create, FileAccess.Write);
-        using var xmlWriter = XmlWriter.Create(fileStream, new() { Indent = true });
-        var serializer = new DataContractSerializer(typeof(T));
-        serializer.WriteObject(xmlWriter, value);
+        var serializer = new DataContractSerializer<T>();
+        serializer.Serialize(fileStream, value);
     }
 }
