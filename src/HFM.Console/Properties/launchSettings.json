@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "HFM.Console": {
+      "commandName": "Project",
+      "commandLineArgs": "%USERPROFILE%\\default.hfmx"
+    }
+  }
+}
