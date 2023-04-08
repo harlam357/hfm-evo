@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace HFM.Core.Artifacts.SlotXml;
+namespace HFM.Core.Artifacts.SlotMarkup;
 
 [DataContract(Namespace = "")]
 [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]

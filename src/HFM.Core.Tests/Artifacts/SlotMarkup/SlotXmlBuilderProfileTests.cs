@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 
-namespace HFM.Core.Artifacts.SlotXml;
+namespace HFM.Core.Artifacts.SlotMarkup;
 
 [TestFixture]
 public class SlotXmlBuilderProfileTests

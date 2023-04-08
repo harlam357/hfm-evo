@@ -46,4 +46,12 @@ public class ClientResourceSortComparer : SortComparer<ClientResource>
 
         return returnValue;
     }
+
+    public static string DefaultSortPropertyName => nameof(ClientResource.Name);
+
+    public static PropertyDescriptor GetSortPropertyOrDefault(string propertyName)
+    {
+        var properties = TypeDescriptor.GetProperties(typeof(ClientResource));
+        return properties.Find(propertyName, true) ?? properties.Find(DefaultSortPropertyName, true)!;
+    }
 }
