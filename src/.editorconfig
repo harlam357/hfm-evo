@@ -10,6 +10,9 @@ root = true
 [*]
 indent_style = space
 
+[*.{csproj,json}]
+indent_size = 2
+
 [*.{cs,vb}]
 
 # Default severity for analyzer diagnostics - Requires **VS2019 16.5** or later
