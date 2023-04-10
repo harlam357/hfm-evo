@@ -47,6 +47,7 @@ public class ClientResourceSortComparer : SortComparer<ClientResource>
         return returnValue;
     }
 
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public static string DefaultSortPropertyName => nameof(ClientResource.Name);
 
     public static PropertyDescriptor GetSortPropertyOrDefault(string propertyName)

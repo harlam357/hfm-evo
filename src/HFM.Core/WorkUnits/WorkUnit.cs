@@ -142,8 +142,8 @@ public record WorkUnit : IProjectInfo, IItemIdentifier
 #pragma warning disable IDE0072 // Add missing cases
         return calculateBonus switch
         {
-            BonusCalculation.DownloadTime => Protein.GetBonusCredit(GetUnitTimeByDownloadTime(frameTime)),
-            BonusCalculation.FrameTime => Protein.GetBonusCredit(GetUnitTimeByFrameTime(frameTime)),
+            BonusCalculation.DownloadTime => Protein.CalculateBonusCredit(GetUnitTimeByDownloadTime(frameTime)),
+            BonusCalculation.FrameTime => Protein.CalculateBonusCredit(GetUnitTimeByFrameTime(frameTime)),
             _ => Protein!.Credit
         };
 #pragma warning restore IDE0072 // Add missing cases
@@ -153,7 +153,7 @@ public record WorkUnit : IProjectInfo, IItemIdentifier
     /// Gets the units per day (UPD) for the given PPD calculation.
     /// </summary>
     public double CalculateUnitsPerDay(PpdCalculation ppdCalculation) =>
-        Protein?.GetUPD(CalculateFrameTime(ppdCalculation)) ?? 0.0;
+        Protein?.CalculateUnitsPerDay(CalculateFrameTime(ppdCalculation)) ?? 0.0;
 
     /// <summary>
     /// Gets the points per day (PPD) for the given PPD and bonus calculations.
@@ -169,9 +169,9 @@ public record WorkUnit : IProjectInfo, IItemIdentifier
 #pragma warning disable IDE0072 // Add missing cases
         return calculateBonus switch
         {
-            BonusCalculation.DownloadTime => Protein.GetBonusPPD(frameTime, GetUnitTimeByDownloadTime(frameTime)),
-            BonusCalculation.FrameTime => Protein.GetBonusPPD(frameTime, GetUnitTimeByFrameTime(frameTime)),
-            _ => Protein.GetPPD(frameTime),
+            BonusCalculation.DownloadTime => Protein.CalculateBonusPointsPerDay(frameTime, GetUnitTimeByDownloadTime(frameTime)),
+            BonusCalculation.FrameTime => Protein.CalculateBonusPointsPerDay(frameTime, GetUnitTimeByFrameTime(frameTime)),
+            _ => Protein.CalculatePointsPerDay(frameTime),
         };
 #pragma warning restore IDE0072 // Add missing cases
     }
