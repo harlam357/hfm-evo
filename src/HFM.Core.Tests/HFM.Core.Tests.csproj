@@ -34,4 +34,19 @@
     <ProjectReference Include="..\HFM.Core\HFM.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\XSL\FormatDate.xslt" Link="TestFiles\XSL\FormatDate.xslt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\XSL\WebOverview.xslt" Link="TestFiles\XSL\WebOverview.xslt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\XSL\WebSlot.xslt" Link="TestFiles\XSL\WebSlot.xslt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\XSL\WebSummary.xslt" Link="TestFiles\XSL\WebSummary.xslt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
