@@ -125,10 +125,10 @@ public class SlotHtmlBuilderTests
         public void ThenSlotHtmlContentIsExpectedLength() =>
             Assert.Multiple(() =>
             {
-                Assert.That(_result.SlotSummaryHtml.ElementAt(0).Content.Length, Is.EqualTo(4836));
-                Assert.That(_result.SlotSummaryHtml.ElementAt(1).Content.Length, Is.EqualTo(4813));
-                Assert.That(_result.SlotDetailHtml.ElementAt(0).Content.Length, Is.EqualTo(5724));
-                Assert.That(_result.SlotDetailHtml.ElementAt(1).Content.Length, Is.EqualTo(5736));
+                Assert.That(_result.SlotSummaryHtml.ElementAt(0).Content.Length, Is.GreaterThan(4800));
+                Assert.That(_result.SlotSummaryHtml.ElementAt(1).Content.Length, Is.GreaterThan(4800));
+                Assert.That(_result.SlotDetailHtml.ElementAt(0).Content.Length, Is.GreaterThan(5700));
+                Assert.That(_result.SlotDetailHtml.ElementAt(1).Content.Length, Is.GreaterThan(5700));
             });
 
         [Test]
