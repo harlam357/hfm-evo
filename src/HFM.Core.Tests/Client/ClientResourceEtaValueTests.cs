@@ -54,6 +54,13 @@ public class ClientResourceEtaValueTests
             }
 
             [Test]
+            public void ThenCompareToNullObjectReturnsOne()
+            {
+                object? obj = null;
+                Assert.That(_x.CompareTo(obj), Is.EqualTo(1));
+            }
+
+            [Test]
             public void ThenEqualOperatorToReturnsTrue() => Assert.That(_x == _y, Is.True);
 
             [Test]
