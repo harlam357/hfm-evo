@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text;
 using System.Xml;
 using System.Xml.Xsl;
 
@@ -7,8 +8,10 @@ using HFM.Preferences;
 
 namespace HFM.Core.Artifacts.SlotMarkup;
 
+[ExcludeFromCodeCoverage]
 public readonly record struct SlotHtmlContent(string Name, StringBuilder Content);
 
+[ExcludeFromCodeCoverage]
 public readonly record struct SlotHtmlBuilderResult(ICollection<SlotHtmlContent> SlotSummaryHtml, ICollection<SlotHtmlContent> SlotDetailHtml);
 
 public class SlotHtmlBuilder
